@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Portfolio · Investor Portal · PAS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;
+  --border:#1a2238;--border2:#243050;
+  --blue:#4a7cff;--green:#1fc98a;--red:#f04166;
+  --amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;
+  --text:#dde4f5;--muted:#566382;--dim:#141b2d;
+  --ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--ffd:'Fraunces',serif;
+  --r:6px;--rl:10px;--acc:#c9a84c;
+}
+html[data-theme="light"]{
+  --bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;
+  --border:#dde1ed;--border2:#c5cbe0;
+  --blue:#2563eb;--green:#16a34a;--red:#dc2626;
+  --amber:#d97706;--gold:#b45309;--purple:#7c3aed;
+  --text:#0f172a;--muted:#64748b;--dim:#e2e8f0;
+}
+html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .22s ease both}.fu1{animation-delay:.05s}.fu2{animation-delay:.1s}.fu3{animation-delay:.15s}.fu4{animation-delay:.2s}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+/* NAV */
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;position:sticky;top:0;z-index:200;gap:0}
+.nav-brand{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-right:8px}
+.nav-sep{color:var(--border2);margin:0 8px;font-size:16px}
+.nav-sub{font-size:11px;color:var(--muted);margin-right:24px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto}
+.nav-item{padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);transition:all .12s;white-space:nowrap;cursor:pointer}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--gold);background:rgba(201,168,76,.1);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:12px;flex-shrink:0}
+.tl-btn{padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--gold);color:var(--text)}
+/* LAYOUT */
+.shell{display:flex;min-height:calc(100vh - 52px)}
+.sidebar{width:220px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.sid-group{margin-bottom:22px}
+.sid-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:0 18px;margin-bottom:8px}
+.sid-item{display:flex;align-items:center;gap:10px;padding:8px 18px;font-size:12px;color:var(--muted);cursor:pointer;border-left:2px solid transparent;transition:all .12s}
+.sid-item:hover{color:var(--text);background:var(--surf2)}
+.sid-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,.07);font-weight:600}
+.sid-badge{margin-left:auto;background:rgba(240,65,102,.2);color:var(--red);font-size:10px;font-weight:700;border-radius:10px;padding:1px 6px}
+.sid-badge.green{background:rgba(31,201,138,.15);color:var(--green)}
+.content{flex:1;padding:28px 28px 20px;min-width:0}
+/* CARDS / METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.m-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.m-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.m-val{font-family:var(--ffm);font-size:20px;font-weight:700}
+.m-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.card-hd{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:9px 14px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--surf2)}
+.tbl td{padding:10px 14px;border-bottom:1px solid var(--border)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--surf2)}
+.nm{font-weight:700;color:var(--text)}
+.num{font-family:var(--ffm);color:var(--text)}
+/* BUTTONS */
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn-sec{padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surf2);color:var(--text);transition:all .15s}
+.btn-sec:hover{border-color:var(--gold);color:var(--gold)}
+.btn-gold{background:var(--gold);color:#000;font-weight:700}
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px;width:520px;max-width:94vw;max-height:88vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.mx{font-size:20px;color:var(--muted);cursor:pointer;line-height:1}
+.mx:hover{color:var(--text)}
+.frow{margin-bottom:13px}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.fi,.fs,.ft{width:100%;padding:8px 11px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--gold)}
+.ft{resize:vertical;min-height:72px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;opacity:0;transform:translateY(40px);transition:all .28s;pointer-events:none;color:#000;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+.page-eye{font-family:var(--ffm);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.page-title{font-family:var(--ffd);font-size:26px;font-weight:600;margin-bottom:4px}
+.page-sub{font-size:12px;color:var(--muted);margin-bottom:22px}
+.section-hd{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:20px 0 12px;display:flex;align-items:center;justify-content:space-between}
+.bar-track{height:5px;background:var(--surf3);border-radius:3px;overflow:hidden;margin-top:5px}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-right:5px}
+/* FOOTER */
+.pg-footer{text-align:center;padding:16px;border-top:1px solid rgba(201,168,76,.1);font-size:11px;color:var(--muted);margin-top:24px}
+.pg-footer span{color:var(--gold);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+/* CHART bars */
+.mini-bars{display:flex;align-items:flex-end;gap:4px;height:60px}
+.mini-bar{flex:1;border-radius:3px 3px 0 0;cursor:pointer;transition:opacity .15s}
+.mini-bar:hover{opacity:.7}
+/* ALLOCATION donut-like rows */
+.alloc-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.alloc-row:last-child{border-bottom:none}
+.alloc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* NOTIFICATIONS */
+.notif{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.notif:last-child{border-bottom:none}
+.notif-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+/* DOC row */
+.doc-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.doc-row:last-child{border-bottom:none}
+/* STATEMENT row */
+.stmt-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border)}
+.stmt-row:last-child{border-bottom:none}
+.filter-pill{padding:3px 11px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .12s}.filter-pill:hover,.filter-pill.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08)}</style>
+</head>
+<body>
+<nav class="topnav">
+  <span class="nav-brand">PAS</span>
+  <span class="nav-sep">|</span>
+  <span class="nav-sub">Investor Portal</span>
+  <div class="nav-links"><a class="nav-item" href="index.html">Overview</a><a class="nav-item active" href="portfolio.html">Portfolio</a><a class="nav-item" href="distributions.html">Distributions</a><a class="nav-item" href="documents.html">Documents</a><a class="nav-item" href="statements.html">Statements</a><a class="nav-item" href="notifications.html">Notifications <span id="nb" style="background:rgba(240,65,102,.2);color:var(--red);font-size:10px;font-weight:700;border-radius:10px;padding:1px 6px">3</span></a></div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--surf2)">
+      <div style="width:26px;height:26px;border-radius:50%;background:rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold)">MP</div>
+      <span style="font-size:12px">M. Prentice</span>
+    </div>
+    <button class="tl-btn" onclick="toggleTheme()" id="tbtn">☀ Light</button>
+    <button class="tl-btn" onclick="openM('contact-m')">Contact IR</button>
+  </div>
+</nav>
+<div class="shell">
+<aside class="sidebar">
+  <div class="sid-group">
+    <div class="sid-lbl">My Account</div>
+    <a class="sid-item " href="index.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill="currentColor"/></svg>
+      Overview</a>
+    <a class="sid-item active" href="portfolio.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 10L4.5 6L7 8.5L11 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Portfolio</a>
+    <a class="sid-item " href="distributions.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Distributions</a>
+  </div>
+  <div class="sid-group">
+    <div class="sid-lbl">Resources</div>
+    <a class="sid-item " href="documents.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="1" width="9" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4.5h5M4 6.5h5M4 8.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Documents</a>
+    <a class="sid-item " href="statements.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="2" width="10" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 5.5h5M4 7.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Statements</a>
+    <a class="sid-item " href="notifications.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5a3.5 3.5 0 013.5 3.5v2.5l1 2H2l1-2V5A3.5 3.5 0 016.5 1.5z" stroke="currentColor" stroke-width="1.3"/><path d="M5 10a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/></svg>
+      Notifications <span class="sid-badge">3</span></a>
+  </div>
+  <div class="sid-group">
+    <div class="sid-lbl">Support</div>
+    <div class="sid-item" onclick="openM('contact-m')">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2.5" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 4.5l5.5 3.5L12 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Contact IR</div>
+    <div class="sid-item" onclick="openM('kyc-m')">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 11.5c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      KYC Status <span class="sid-badge green">OK</span></div>
+  </div>
+  <div style="padding:14px 18px;border-top:1px solid var(--border)">
+    <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Account</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text)">Prentice Capital</div>
+    <div style="font-size:10px;color:var(--muted)">ID #LP-0042 · HNWI</div>
+  </div>
+</aside>
+<div class="content">
+  <div class="page-eye fu">Portfolio · Holdings & Risk</div>
+  <div class="page-title fu">Holdings & Risk Analysis</div>
+  <div class="page-sub fu"><span style='display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;margin-right:5px'></span>Live via Portfolio Monitor · Apr 5, 2026</div>
+  
+<div class="metrics fu">
+  <div class="m-box"><div class="m-lbl">Total NAV</div><div class="m-val" style="color:var(--gold)">$1.92M</div><div class="m-sub">↑ +0.97% MTD</div></div>
+  <div class="m-box"><div class="m-lbl">Unrealised Gain</div><div class="m-val" style="color:var(--green)">+$1.17M</div><div class="m-sub">+153.7% cost basis</div></div>
+  <div class="m-box"><div class="m-lbl">TVPI</div><div class="m-val">2.54x</div><div class="m-sub">Value / paid-in</div></div>
+  <div class="m-box"><div class="m-lbl">Net IRR</div><div class="m-val" style="color:var(--green)">38.2%</div><div class="m-sub">Since Jun 2024</div></div>
+  <div class="m-box"><div class="m-lbl">Risk Score</div><div class="m-val" style="color:var(--green)">Low</div><div class="m-sub">VaR 95%: $28.4K</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+  <div class="card fu1">
+    <div class="card-hd"><span class="card-title">Strategy Positions</span>
+      <select class="fs" style="width:120px;padding:4px 8px;font-size:11px" onchange="filterPos(this.value)">
+        <option value="all">All Strategies</option>
+        <option>Private Equity</option><option>Private Credit</option><option>Commodities</option>
+      </select>
+    </div>
+    <table class="tbl"><thead><tr><th>Strategy</th><th>Cost Basis</th><th>Current NAV</th><th>Return</th><th>% Portfolio</th><th>Status</th></tr></thead>
+    <tbody id="pos-body"></tbody></table>
+  </div>
+  <div class="card fu2">
+    <div class="card-hd"><span class="card-title">Allocation</span></div>
+    <div style="padding:14px" id="alloc-body"></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+  <div class="card fu3">
+    <div class="card-hd"><span class="card-title">Risk Metrics</span><span style="font-size:10px;color:var(--green)">● Low overall</span></div>
+    <div style="padding:14px" id="risk-body"></div>
+  </div>
+  <div class="card fu4">
+    <div class="card-hd"><span class="card-title">Covenant Compliance</span><span class="tag" style="background:rgba(31,201,138,.12);color:var(--green)">All Pass</span></div>
+    <table class="tbl"><thead><tr><th>Covenant</th><th>Limit</th><th>Current</th><th>Status</th></tr></thead>
+    <tbody id="cov-body"></tbody></table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-hd"><span class="card-title">Performance vs Benchmark (Quarterly)</span></div>
+  <div style="padding:16px">
+    <div style="display:flex;align-items:flex-end;gap:6px;height:80px" id="bench-bars"></div>
+    <div style="display:flex;justify-content:space-around;font-size:10px;color:var(--muted);margin-top:6px">
+      <span>Q1 2025</span><span>Q2 2025</span><span>Q3 2025</span><span>Q4 2025</span><span>Q1 2026</span>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:10px;font-size:11px">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--gold);display:inline-block"></span>Your return</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--surf3);display:inline-block"></span>Benchmark</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div class="modal-ov" id="contact-m" onclick="if(event.target===this)closeM('contact-m')">
+<div class="modal">
+  <div class="modal-title">Contact Investor Relations <button class="mx" onclick="closeM('contact-m')">✕</button></div>
+  <div class="frow"><label class="fl">Subject</label>
+    <select class="fs" id="ir-sub"><option>Capital Call Enquiry</option><option>Distribution Schedule</option><option>Fund Performance Question</option><option>Document Request</option><option>Other</option></select></div>
+  <div class="frow"><label class="fl">Message</label><textarea class="ft" id="ir-msg" placeholder="How can we help?"></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+    <button class="btn-sec" onclick="closeM('contact-m')">Cancel</button>
+    <button class="btn btn-gold" onclick="sendIR()">Send to IR</button>
+  </div>
+</div></div>
+
+<div class="modal-ov" id="kyc-m" onclick="if(event.target===this)closeM('kyc-m')">
+<div class="modal">
+  <div class="modal-title">KYC & Compliance Status <button class="mx" onclick="closeM('kyc-m')">✕</button></div>
+  <div style="display:grid;gap:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surf2);border-radius:var(--r)"><div><div style="font-weight:600;font-size:13px">Identity Verification</div><div style="font-size:11px;color:var(--muted)">Passport · Verified Mar 2024</div></div><span class="tag" style="background:rgba(31,201,138,.15);color:var(--green)">Verified</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surf2);border-radius:var(--r)"><div><div style="font-weight:600;font-size:13px">AML Screening</div><div style="font-size:11px;color:var(--muted)">PEP/Sanctions · Clean</div></div><span class="tag" style="background:rgba(31,201,138,.15);color:var(--green)">Clear</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surf2);border-radius:var(--r)"><div><div style="font-weight:600;font-size:13px">Annual Refresh</div><div style="font-size:11px;color:var(--muted)">Due: Mar 2027</div></div><span class="tag" style="background:rgba(245,158,11,.15);color:var(--amber)">Due 2027</span></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn btn-gold" onclick="closeM('kyc-m')">Close</button></div>
+</div></div>
+<div id="_toast" class="toast"></div>
+<div class="pg-footer"><span>Prime Alpha Securities</span> &nbsp;·&nbsp; Investor Portal &nbsp;·&nbsp; Confidential</div>
+<script>
+
+function toggleTheme(){const d=document.documentElement,cur=d.getAttribute('data-theme')||'dark',next=cur==='dark'?'light':'dark';d.setAttribute('data-theme',next);localStorage.setItem('pas_theme',next);document.getElementById('tbtn').textContent=next==='dark'?'☀ Light':'◑ Dark';}
+(function(){const t=localStorage.getItem('pas_theme')||'dark';document.documentElement.setAttribute('data-theme',t);window.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('tbtn');if(b)b.textContent=t==='dark'?'☀ Light':'◑ Dark';});})();
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function toast(msg,col){const t=document.getElementById('_toast');t.textContent=msg;t.style.background=col||'#c9a84c';t.style.color='#000';t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2800);}
+
+function sendIR(){const msg=document.getElementById('ir-msg').value;if(!msg.trim()){toast('Enter a message','#f04166');return;}closeM('contact-m');toast('Message sent to IR team','#c9a84c');document.getElementById('ir-msg').value='';}
+
+const POS=[
+  {s:'Private Equity',cost:359400,nav:921400,ret:'+156.4%',pct:59.9,status:'Active'},
+  {s:'Private Credit',cost:131700,nav:282200,ret:'+114.3%',pct:21.9,status:'Active'},
+  {s:'Commodities',cost:108900,nav:243200,ret:'+123.3%',pct:18.2,status:'Active'},
+  {s:'Real Estate',cost:0,nav:0,ret:'—',pct:0,status:'Fundraising'},
+];
+const ALLOC=[{l:'Private Equity',p:59.9,c:'#4a7cff'},{l:'Private Credit',p:21.9,c:'#1fc98a'},{l:'Commodities',p:18.2,c:'#c9a84c'},{l:'Real Estate',p:0,c:'#566382'}];
+const RISK=[{l:'VaR 95%',v:'$28.4K',s:'Low'},{l:'Max Drawdown',v:'-3.1%',s:'Low'},{l:'PE Concentration',v:'59.9%',s:'Medium'},{l:'FX Exposure',v:'22% XAF',s:'Low'},{l:'Liquidity',v:'High',s:'OK'}];
+const COV=[{n:'Leverage ≤ 3.0x',lim:'3.0x',cur:'1.8x',ok:true},{n:'Interest Coverage ≥ 2.5x',lim:'2.5x',cur:'4.1x',ok:true},{n:'Cash Reserve ≥ 5%',lim:'5%',cur:'8.2%',ok:true},{n:'PE Conc. ≤ 70%',lim:'70%',cur:'59.9%',ok:true}];
+const BENCH=[{q:'Q1 25',y:24.1,b:8.4},{q:'Q2 25',y:18.4,b:6.1},{q:'Q3 25',y:12.2,b:4.8},{q:'Q4 25',y:9.8,b:5.2},{q:'Q1 26',y:4.1,b:2.3}];
+let pf='all';
+function filterPos(v){pf=v;renderPos();}
+function renderPos(){
+  const sc={Active:'rgba(31,201,138,.12)',Fundraising:'rgba(86,99,130,.12)'};
+  const tc={Active:'#1fc98a',Fundraising:'#566382'};
+  const list=pf==='all'?POS:POS.filter(p=>p.s===pf);
+  document.getElementById('pos-body').innerHTML=list.map(p=>`<tr>
+    <td style="font-weight:700;color:var(--text)">${p.s}</td>
+    <td style="font-family:var(--ffm);font-size:12px">$${(p.cost/1000).toFixed(0)}K</td>
+    <td style="font-family:var(--ffm);font-size:12px;color:var(--gold)">$${(p.nav/1000).toFixed(0)}K</td>
+    <td style="font-family:var(--ffm);font-size:12px;color:var(--green)">${p.ret}</td>
+    <td><div style="display:flex;align-items:center;gap:6px"><div style="width:50px;height:4px;background:var(--border);border-radius:2px"><div style="height:100%;width:${p.pct}%;background:var(--gold)"></div></div><span style="font-family:var(--ffm);font-size:10px">${p.pct}%</span></div></td>
+    <td><span class="tag" style="background:${sc[p.status]};color:${tc[p.status]}">${p.status}</span></td>
+  </tr>`).join('');
+}
+function renderAlloc(){
+  document.getElementById('alloc-body').innerHTML=ALLOC.map(a=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="width:8px;height:8px;border-radius:50%;background:${a.c};flex-shrink:0"></div>
+      <div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px">${a.l}</span><span style="font-family:var(--ffm);font-size:12px;font-weight:700">${a.p}%</span></div>
+        <div style="height:4px;background:var(--surf3);border-radius:2px"><div style="height:100%;width:${a.p}%;background:${a.c};border-radius:2px"></div></div></div>
+    </div>`).join('');
+}
+function renderRisk(){
+  const col={Low:'var(--green)',Medium:'var(--amber)',OK:'var(--green)'};
+  const bg={Low:'rgba(31,201,138,.1)',Medium:'rgba(245,158,11,.1)',OK:'rgba(31,201,138,.1)'};
+  document.getElementById('risk-body').innerHTML=RISK.map(r=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;color:var(--muted)">${r.l}</span>
+      <div style="display:flex;gap:7px;align-items:center">
+        <span style="font-family:var(--ffm);font-size:12px;font-weight:700">${r.v}</span>
+        <span class="tag" style="background:${bg[r.s]};color:${col[r.s]}">${r.s}</span>
+      </div>
+    </div>`).join('');
+}
+function renderCov(){
+  document.getElementById('cov-body').innerHTML=COV.map(c=>`<tr>
+    <td style="font-size:12px">${c.n}</td>
+    <td style="font-family:var(--ffm);font-size:11px;color:var(--muted)">${c.lim}</td>
+    <td style="font-family:var(--ffm);font-size:12px;font-weight:700;color:var(--gold)">${c.cur}</td>
+    <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Pass</span></td>
+  </tr>`).join('');
+}
+function renderBench(){
+  const max=Math.max(...BENCH.map(b=>Math.max(b.y,b.b)));
+  document.getElementById('bench-bars').innerHTML=BENCH.map(b=>`
+    <div style="flex:1;display:flex;align-items:flex-end;gap:3px">
+      <div style="flex:1;height:${Math.round(b.y/max*72)}px;background:var(--gold);border-radius:3px 3px 0 0;cursor:pointer" title="${b.q} Your: +${b.y}%" onclick="toast('${b.q}: Your +${b.y}% vs Benchmark +${b.b}%','#c9a84c')"></div>
+      <div style="flex:1;height:${Math.round(b.b/max*72)}px;background:var(--surf3);border-radius:3px 3px 0 0"></div>
+    </div>`).join('');
+}
+renderPos();renderAlloc();renderRisk();renderCov();renderBench();
+
+</script>
+</body>
+</html>
