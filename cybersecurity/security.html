@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cybersecurity — Security Posture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;
+  --border:#1a2238;--border2:#1f2d47;
+  --blue:#4a7cff;--blue-d:rgba(74,124,255,.1);
+  --green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;
+  --text:#dde4f5;--muted:#566382;--dim:#1c2540;
+  --ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--ffd:'Fraunces',serif;
+  --r:6px;--rl:10px;
+}
+html[data-theme="light"]{
+  --bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;
+  --border:#dde1ed;--border2:#c5cbe0;
+  --blue:#2563eb;--blue-d:rgba(37,99,235,.08);
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;
+  --text:#0f172a;--muted:#64748b;--dim:#e2e8f0;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.fu{animation:fadeUp .2s ease both}.fu1{animation-delay:.06s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;color:var(--red);letter-spacing:.15em;text-transform:uppercase}
+.nav-sep{color:var(--border2);margin:0 8px}
+.nav-sub{font-size:11px;color:var(--muted);margin-right:20px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--red);background:rgba(240,65,102,.08);font-weight:600}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s;margin-left:8px}
+.tl-btn:hover{border-color:var(--blue);color:var(--text)}
+.guard-live{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-family:var(--ffm)}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+.main{flex:1;padding:22px 24px;max-width:1200px;margin:0 auto;width:100%}
+.page-eyebrow{font-family:var(--ffm);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.page-title{font-family:var(--ffd);font-size:24px;font-weight:600;margin-bottom:16px}
+
+/* Score + metrics */
+.top-row{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-bottom:18px}
+.score-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.score-ring{position:relative;width:120px;height:120px;margin:0 auto 12px}
+.score-number{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-val{font-family:var(--ffm);font-size:32px;font-weight:700;color:var(--green)}
+.score-lbl{font-size:10px;color:var(--muted)}
+.score-title{font-size:12px;font-weight:700;margin-bottom:3px}
+.score-sub{font-size:10px;color:var(--muted)}
+.metrics-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.m-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px}
+.m-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+.m-val{font-family:var(--ffm);font-size:18px;font-weight:700}
+.m-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Main grid */
+.grid-main{display:grid;grid-template-columns:1fr 320px;gap:14px}
+.s-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:14px;overflow:hidden}
+.s-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+
+/* Findings table */
+.f-table{width:100%;border-collapse:collapse;font-size:11px}
+.f-table th{text-align:left;padding:7px 14px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--surf2)}
+.f-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted)}
+.f-table tr:last-child td{border-bottom:none}
+.f-table tr:hover td{background:var(--surf2)}
+.sev-chip{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:3px}
+
+/* Compliance checklist */
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.check-label{flex:1;font-size:12px;font-weight:500}
+.check-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.check-status{font-size:10px;font-weight:700;white-space:nowrap}
+
+/* GuardDuty */
+.gd-item{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.gd-item:hover{background:var(--surf2)}
+.gd-item:last-child{border-bottom:none}
+.gd-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.gd-title{font-size:11px;font-weight:700;color:var(--text)}
+.gd-time{font-family:var(--ffm);font-size:9px;color:var(--muted);margin-left:auto}
+.gd-detail{font-size:10px;color:var(--muted);line-height:1.5}
+.gd-empty{padding:28px;text-align:center;font-size:12px;color:var(--muted)}
+
+/* IAM summary */
+.iam-row{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px}
+.iam-row:last-child{border-bottom:none}
+.iam-name{color:var(--muted);font-family:var(--ffm);font-size:10px}
+.iam-perms{font-family:var(--ffm);font-size:11px;font-weight:700}
+
+.pg-footer{padding:10px 24px;border-top:1px solid rgba(201,168,76,.12);text-align:center;font-size:11px;color:var(--muted)}
+.pg-footer span{color:var(--gold);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="topnav">
+  <div class="nav-logo">PAS</div>
+  <div class="nav-sep">|</div>
+  <div class="nav-sub">Cybersecurity</div>
+  <div class="nav-links">
+    <a class="nav-item active" href="#">&#128737; Posture</a>
+    <a class="nav-item" href="#">&#128101; IAM & Access</a>
+    <a class="nav-item" href="#">&#128270; GuardDuty</a>
+    <a class="nav-item" href="#">&#9989; Compliance</a>
+    <a class="nav-item" href="#">&#128203; CloudTrail</a>
+  </div>
+  <div class="nav-right" style="display:flex;align-items:center;gap:8px;margin-left:auto">
+    <div class="guard-live"><div class="pulse-dot"></div>GuardDuty Active</div>
+    <button class="tl-btn" onclick="toggleTheme()">&#9728;</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="fu">
+    <div class="page-eyebrow">Security Posture</div>
+    <div class="page-title">Cybersecurity Dashboard</div>
+  </div>
+
+  <div class="top-row fu1">
+    <div class="score-card">
+      <div class="score-ring">
+        <canvas id="scoreChart" width="120" height="120"></canvas>
+        <div class="score-number">
+          <div class="score-val">94</div>
+          <div class="score-lbl">/ 100</div>
+        </div>
+      </div>
+      <div class="score-title" style="color:var(--green)">Security Score</div>
+      <div class="score-sub">Excellent · +2 from last month</div>
+    </div>
+    <div class="metrics-grid">
+      <div class="m-box">
+        <div class="m-lbl">Critical Findings</div>
+        <div class="m-val" style="color:var(--green)">0</div>
+        <div class="m-sub">last 30 days</div>
+      </div>
+      <div class="m-box">
+        <div class="m-lbl">High Findings</div>
+        <div class="m-val" style="color:var(--green)">0</div>
+        <div class="m-sub">last 30 days</div>
+      </div>
+      <div class="m-box">
+        <div class="m-lbl">Medium Findings</div>
+        <div class="m-val" style="color:var(--amber)">1</div>
+        <div class="m-sub">MFA — 1 IAM user</div>
+      </div>
+      <div class="m-box">
+        <div class="m-lbl">GuardDuty</div>
+        <div class="m-val" style="color:var(--green)">Clean</div>
+        <div class="m-sub">0 threats detected</div>
+      </div>
+      <div class="m-box">
+        <div class="m-lbl">Compliance</div>
+        <div class="m-val" style="color:var(--green)">18/19</div>
+        <div class="m-sub">controls passing</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-main fu2">
+    <div>
+      <div class="s-card">
+        <div class="s-title">IAM Findings & Access Review</div>
+        <table class="f-table">
+          <tr><th>Severity</th><th>Finding</th><th>Resource</th><th>Status</th><th>Action</th></tr>
+          <tr>
+            <td><span class="sev-chip" style="background:rgba(245,158,11,.15);color:var(--amber)">Medium</span></td>
+            <td style="color:var(--text);font-weight:600">MFA not enabled</td>
+            <td style="font-family:var(--ffm);font-size:10px">iam/user/service-reporting</td>
+            <td><span class="tag" style="background:rgba(245,158,11,.1);color:var(--amber)">Open</span></td>
+            <td><button style="font-size:10px;color:var(--blue);font-weight:700;cursor:pointer">Enable MFA →</button></td>
+          </tr>
+          <tr>
+            <td><span class="sev-chip" style="background:rgba(31,201,138,.1);color:var(--green)">Info</span></td>
+            <td style="color:var(--text);font-weight:600">Access key age review</td>
+            <td style="font-family:var(--ffm);font-size:10px">iam/user/pas-ci-deploy</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Resolved</span></td>
+            <td><span style="font-size:10px;color:var(--muted)">Rotated 02 Apr</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="s-card">
+        <div class="s-title">IAM Least-Privilege — Lambda Roles</div>
+        <table class="f-table">
+          <tr><th>Lambda Function</th><th>IAM Role</th><th>Permissions</th><th>Status</th></tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas-price-scraper-jse</td>
+            <td style="font-family:var(--ffm);font-size:10px">role/pas-scraper-exec</td>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--green)">dynamodb:PutItem · s3:PutObject</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Least Priv.</span></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas-report-generator</td>
+            <td style="font-family:var(--ffm);font-size:10px">role/pas-report-exec</td>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--green)">athena:StartQueryExec · s3:Get/Put · ses:SendEmail</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Least Priv.</span></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas-covenant-checker</td>
+            <td style="font-family:var(--ffm);font-size:10px">role/pas-covenant-exec</td>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--green)">dynamodb:GetItem · sns:Publish · s3:PutObject</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Least Priv.</span></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas-risk-aggregator</td>
+            <td style="font-family:var(--ffm);font-size:10px">role/pas-risk-exec</td>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--green)">athena:* (read) · s3:PutObject · sns:Publish</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Least Priv.</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="s-card">
+        <div class="s-title">Secrets Manager — API Key Rotation</div>
+        <table class="f-table">
+          <tr><th>Secret</th><th>Service</th><th>Last Rotated</th><th>Next Rotation</th><th>Status</th></tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas/prod/eodhd-api-key</td>
+            <td>EODHD Market Data</td>
+            <td style="font-family:var(--ffm);font-size:10px">01 Apr 2026</td>
+            <td style="font-family:var(--ffm);font-size:10px">01 May 2026</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Auto &#10003;</span></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas/prod/anthropic-api-key</td>
+            <td>Anthropic AI</td>
+            <td style="font-family:var(--ffm);font-size:10px">15 Mar 2026</td>
+            <td style="font-family:var(--ffm);font-size:10px">15 Apr 2026</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Auto &#10003;</span></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--ffm);font-size:10px;color:var(--text)">pas/prod/opensanctions-key</td>
+            <td>OpenSanctions</td>
+            <td style="font-family:var(--ffm);font-size:10px">01 Apr 2026</td>
+            <td style="font-family:var(--ffm);font-size:10px">01 May 2026</td>
+            <td><span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">Auto &#10003;</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="s-card" style="margin-bottom:14px">
+        <div class="s-title">GuardDuty — Threat Intel</div>
+        <div class="gd-empty">
+          <div style="font-size:28px;margin-bottom:8px">&#128737;</div>
+          <div style="font-weight:700;color:var(--green);margin-bottom:4px">No threats detected</div>
+          <div style="font-size:11px">Last 30 days · Continuous monitoring active</div>
+        </div>
+      </div>
+
+      <div class="s-card" style="margin-bottom:14px">
+        <div class="s-title">Compliance Controls</div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">MFA for all system users</div>
+            <div class="check-meta">Amazon Cognito · enforced</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">KMS encryption — all S3 & DynamoDB</div>
+            <div class="check-meta">aws:kms · server-side</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">WAF — OWASP ruleset on API Gateway</div>
+            <div class="check-meta">aws-managed-rules-common</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">CloudTrail — all regions enabled</div>
+            <div class="check-meta">Permanent S3 storage</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">IAM least-privilege — all Lambda roles</div>
+            <div class="check-meta">Enforced at Terraform plan</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(245,158,11,.1);color:var(--amber)">!</div>
+          <div style="flex:1">
+            <div class="check-label">MFA for all IAM users</div>
+            <div class="check-meta">1 service user pending MFA setup</div>
+          </div>
+          <div class="check-status" style="color:var(--amber)">Warn</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">Secrets Manager — all API keys</div>
+            <div class="check-meta">Auto-rotation enabled</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+        <div class="check-item">
+          <div class="check-ico" style="background:rgba(31,201,138,.1);color:var(--green)">&#10003;</div>
+          <div style="flex:1">
+            <div class="check-label">No hardcoded credentials in code</div>
+            <div class="check-meta">GitHub secret scanning · CodeBuild check</div>
+          </div>
+          <div class="check-status" style="color:var(--green)">Pass</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pg-footer"><span>Prime Alpha Securities</span> &nbsp;·&nbsp; Cybersecurity Framework &nbsp;·&nbsp; Confidential</div>
+</div>
+
+<script>
+function renderScore(light){
+  const c=document.getElementById('scoreChart').getContext('2d');
+  if(window._sc) window._sc.destroy();
+  window._sc=new Chart(c,{
+    type:'doughnut',
+    data:{
+      labels:['Score','Remaining'],
+      datasets:[{data:[94,6],backgroundColor:['#1fc98a',light?'#dde1ed':'#1a2238'],borderWidth:0,hoverOffset:0}]
+    },
+    options:{responsive:false,cutout:'78%',plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  });
+}
+
+renderScore(false);
+
+function toggleTheme(){
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  renderScore(!dark);
+}
+</script>
+</body>
+</html>

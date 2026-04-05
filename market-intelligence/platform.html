@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Market Intelligence — Strategic Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;
+  --border:#1a2238;--border2:#1f2d47;
+  --blue:#4a7cff;--blue-d:rgba(74,124,255,.1);
+  --green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;
+  --text:#dde4f5;--muted:#566382;--dim:#1c2540;
+  --ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--ffd:'Fraunces',serif;
+  --r:6px;--rl:10px;
+}
+html[data-theme="light"]{
+  --bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;
+  --border:#dde1ed;--border2:#c5cbe0;
+  --blue:#2563eb;--blue-d:rgba(37,99,235,.08);
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;
+  --text:#0f172a;--muted:#64748b;--dim:#e2e8f0;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .22s ease both}.fu1{animation-delay:.07s}.fu2{animation-delay:.14s}.fu3{animation-delay:.21s}.fu4{animation-delay:.28s}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.15em;text-transform:uppercase}
+.nav-sep{color:var(--border2);margin:0 8px}
+.nav-sub{font-size:11px;color:var(--muted);margin-right:20px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--gold);background:rgba(201,168,76,.1);font-weight:600}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s;margin-left:8px}
+.tl-btn:hover{border-color:var(--blue);color:var(--text)}
+
+.main{flex:1;padding:0 0 60px}
+
+/* Hero section */
+.hero{padding:60px 40px 48px;text-align:center;max-width:800px;margin:0 auto;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px}
+.hero-title{font-family:var(--ffd);font-size:clamp(28px,5vw,46px);font-weight:700;line-height:1.15;margin-bottom:14px}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.8;max-width:620px;margin:0 auto 28px}
+.hero-cost{display:inline-flex;align-items:baseline;gap:4px;padding:12px 28px;background:rgba(31,201,138,.08);border:1px solid rgba(31,201,138,.2);border-radius:var(--rl)}
+.hero-cost-val{font-family:var(--ffm);font-size:36px;font-weight:700;color:var(--green)}
+.hero-cost-sub{font-size:12px;color:var(--muted)}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surf);margin-bottom:0}
+.stat-cell{padding:20px;text-align:center;border-right:1px solid var(--border)}
+.stat-cell:last-child{border-right:none}
+.stat-val{font-family:var(--ffm);font-size:26px;font-weight:700;margin-bottom:4px}
+.stat-lbl{font-size:11px;color:var(--muted)}
+
+/* Content sections */
+.content{padding:0 40px;max-width:1100px;margin:0 auto}
+.section-title{font-family:var(--ffd);font-size:22px;font-weight:600;margin-bottom:6px}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+
+/* Advantages */
+.advantage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
+.adv-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:20px;position:relative;overflow:hidden;transition:all .18s}
+.adv-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac-color,var(--blue))}
+.adv-card:hover{transform:translateY(-2px);border-color:var(--ac-color,var(--blue))}
+.adv-icon{font-size:24px;margin-bottom:12px}
+.adv-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.adv-text{font-size:12px;color:var(--muted);line-height:1.7}
+.adv-metric{font-family:var(--ffm);font-size:20px;font-weight:700;margin-top:10px}
+.adv-metric-lbl{font-size:10px;color:var(--muted)}
+
+/* Cost comparison table */
+.cost-section{margin-bottom:48px}
+.cost-table{width:100%;border-collapse:collapse;background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.cost-table th{text-align:left;padding:12px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--surf2);border-bottom:1px solid var(--border)}
+.cost-table td{padding:12px 18px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted)}
+.cost-table tr:last-child td{border-bottom:none}
+.cost-table tr:hover td{background:var(--surf2)}
+.cost-highlight{background:rgba(31,201,138,.04)!important}
+.cost-highlight td{color:var(--text)}
+.cost-name{font-weight:700;color:var(--text)}
+.cost-num{font-family:var(--ffm);font-weight:700}
+.cost-savings{font-family:var(--ffm);font-size:11px;font-weight:700}
+.cost-total{background:var(--surf2)!important;font-weight:700}
+
+/* Timeline */
+.timeline-section{margin-bottom:48px}
+.timeline{display:flex;flex-direction:column;gap:0;border-left:2px solid var(--border);margin-left:24px;padding-left:28px}
+.tl-item{position:relative;padding-bottom:28px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-38px;top:2px;width:16px;height:16px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;background:var(--bg)}
+.tl-phase{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.tl-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.tl-desc{font-size:12px;color:var(--muted);line-height:1.7}
+.tl-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* Bot registry */
+.bot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:48px}
+.bot-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:all .12s}
+.bot-card:hover{border-color:var(--gold);background:var(--surf2)}
+.bot-name{font-family:var(--ffm);font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bot-schedule{font-size:10px;color:var(--muted);margin-bottom:4px;font-family:var(--ffm)}
+.bot-status{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--green)}
+.bot-dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
+
+.pg-footer{padding:20px 24px;border-top:1px solid rgba(201,168,76,.12);text-align:center;font-size:11px;color:var(--muted)}
+.pg-footer span{color:var(--gold);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="topnav">
+  <div class="nav-logo">PAS</div>
+  <div class="nav-sep">|</div>
+  <div class="nav-sub">Strategic Vision</div>
+  <div class="nav-links">
+    <a class="nav-item active" href="#">&#127942; Platform Overview</a>
+    <a class="nav-item" href="#">&#128200; Bot Registry</a>
+    <a class="nav-item" href="#">&#128176; Cost Analysis</a>
+    <a class="nav-item" href="#">&#128337; Roadmap</a>
+    <a class="nav-item" href="#">&#127932; Competitive Edge</a>
+  </div>
+  <button class="tl-btn" onclick="toggleTheme()">&#9728;</button>
+</nav>
+
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero fu">
+    <div class="hero-badge">&#127942; Initiative 15 of 15 &nbsp;·&nbsp; Strategic Vision</div>
+    <h1 class="hero-title">One Platform.<br/>Four Strategies. African Markets.</h1>
+    <p class="hero-sub">Prime Alpha Securities operates a vertically integrated, AI-augmented investment management platform purpose-built for African private markets. 15 initiatives, 19 Digital Analyst bots, 4 fund verticals — the full platform for one monthly bill.</p>
+    <div class="hero-cost">
+      <div class="hero-cost-val">~$199</div>
+      <div class="hero-cost-sub">&nbsp;/ month · full 15-initiative platform · all 19 bots · all 4 strategies</div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-row fu1">
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--blue)">15</div>
+      <div class="stat-lbl">Technology initiatives</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--green)">19</div>
+      <div class="stat-lbl">Digital Analyst bots</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--amber)">4</div>
+      <div class="stat-lbl">Fund strategies</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--gold)">$0</div>
+      <div class="stat-lbl">Lambda compute cost</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--green)">2.5%</div>
+      <div class="stat-lbl">AWS Free Tier used</div>
+    </div>
+  </div>
+
+  <div style="padding:40px 40px 0;max-width:1100px;margin:0 auto">
+
+  <!-- Competitive advantages -->
+  <div class="fu2">
+    <div class="section-title">Structural Competitive Advantages</div>
+    <div class="section-sub">Technology is not a support function — it is a source of structural competitive advantage.</div>
+    <div class="advantage-grid">
+      <div class="adv-card" style="--ac-color:#4a7cff">
+        <div class="adv-icon">&#128200;</div>
+        <div class="adv-title">Data-Driven Decisions</div>
+        <div class="adv-text">Every investment thesis supported by structured, analysed data from the Athena data lake. Historical African market prices since day one compound in institutional value.</div>
+        <div class="adv-metric" style="color:var(--blue)">847K+</div>
+        <div class="adv-metric-lbl">price records in data lake</div>
+      </div>
+      <div class="adv-card" style="--ac-color:#1fc98a">
+        <div class="adv-icon">&#9889;</div>
+        <div class="adv-title">Automated Operations</div>
+        <div class="adv-text">19 Digital Analyst bots run recurring operational tasks without manual intervention. Staff focused exclusively on judgment, relationships, and strategy.</div>
+        <div class="adv-metric" style="color:var(--green)">$0</div>
+        <div class="adv-metric-lbl">Lambda compute — 2.5% of free tier</div>
+      </div>
+      <div class="adv-card" style="--ac-color:#f59e0b">
+        <div class="adv-icon">&#127758;</div>
+        <div class="adv-title">African Market Depth</div>
+        <div class="adv-text">JSE, AFEX, ECX, and GCX prices captured every session. FX rates for ZAR, NGN, KES, ETB, GHS every 15 minutes. Permanent historical database no competitor has.</div>
+        <div class="adv-metric" style="color:var(--amber)">4</div>
+        <div class="adv-metric-lbl">African exchanges, daily</div>
+      </div>
+      <div class="adv-card" style="--ac-color:#a78bfa">
+        <div class="adv-icon">&#128736;</div>
+        <div class="adv-title">Scalable at Zero Marginal Cost</div>
+        <div class="adv-text">Add a new fund strategy by deploying one new Lambda function and DynamoDB table via Terraform. No servers to provision, no containers to manage, no EC2 to maintain.</div>
+        <div class="adv-metric" style="color:var(--purple)">≈$0</div>
+        <div class="adv-metric-lbl">marginal cost to add a strategy</div>
+      </div>
+      <div class="adv-card" style="--ac-color:#1fc98a">
+        <div class="adv-icon">&#128274;</div>
+        <div class="adv-title">Institutional Security</div>
+        <div class="adv-text">KMS encryption everywhere, IAM least-privilege enforced by Terraform, GuardDuty continuous monitoring, CloudTrail permanent audit, WAF on all APIs — built in, not bolted on.</div>
+        <div class="adv-metric" style="color:var(--green)">94/100</div>
+        <div class="adv-metric-lbl">security posture score</div>
+      </div>
+      <div class="adv-card" style="--ac-color:#c9a84c">
+        <div class="adv-icon">&#128201;</div>
+        <div class="adv-title">Institutional-Quality Reporting</div>
+        <div class="adv-text">LP reports generated from the Athena data lake, rendered by WeasyPrint, delivered via SES. Bilingual EN/FR. $0.05 per quarterly run for all 12 limited partners.</div>
+        <div class="adv-metric" style="color:var(--gold)">$0.05</div>
+        <div class="adv-metric-lbl">per quarterly LP report run</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost comparison -->
+  <div class="cost-section fu3">
+    <div class="section-title">Full Platform Cost Comparison</div>
+    <div class="section-sub">vs. traditional enterprise investment management software</div>
+    <table class="cost-table">
+      <tr><th>Service / Capability</th><th>Traditional SaaS Alternative</th><th>Our Cost</th><th>Saving</th></tr>
+      <tr>
+        <td class="cost-name">Portfolio management system</td>
+        <td>Allvue / Dynamo — $3,000/month</td>
+        <td class="cost-num" style="color:var(--green)">$12.40</td>
+        <td class="cost-savings" style="color:var(--green)">-99.6%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">Market data (African exchanges)</td>
+        <td>Bloomberg Africa — $2,000/month</td>
+        <td class="cost-num" style="color:var(--green)">$18.20</td>
+        <td class="cost-savings" style="color:var(--green)">-99.1%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">Data warehouse / BI</td>
+        <td>Redshift + Tableau — $400/month</td>
+        <td class="cost-num" style="color:var(--green)">$8.40</td>
+        <td class="cost-savings" style="color:var(--green)">-97.9%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">LP reporting / document generation</td>
+        <td>Solovis / iLevel — $1,500/month</td>
+        <td class="cost-num" style="color:var(--green)">$0.62</td>
+        <td class="cost-savings" style="color:var(--green)">-99.9%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">CRM / investor relations</td>
+        <td>Salesforce FS Cloud — $800/month</td>
+        <td class="cost-num" style="color:var(--green)">$4.20</td>
+        <td class="cost-savings" style="color:var(--green)">-99.5%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">Document management + security</td>
+        <td>Intralinks / Datasite — $500/month</td>
+        <td class="cost-num" style="color:var(--green)">$22.80</td>
+        <td class="cost-savings" style="color:var(--green)">-95.4%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">AI / due diligence automation</td>
+        <td>Kira / Luminance — $2,000/month</td>
+        <td class="cost-num" style="color:var(--green)">$38.00</td>
+        <td class="cost-savings" style="color:var(--green)">-98.1%</td>
+      </tr>
+      <tr>
+        <td class="cost-name">Compliance & cybersecurity</td>
+        <td>Drata / Vanta — $500/month</td>
+        <td class="cost-num" style="color:var(--green)">$42.60</td>
+        <td class="cost-savings" style="color:var(--green)">-91.5%</td>
+      </tr>
+      <tr class="cost-highlight cost-total">
+        <td class="cost-name" style="color:var(--gold)">&#127942; Full Platform Total</td>
+        <td style="color:var(--muted);text-decoration:line-through">~$10,700/month (SaaS stack)</td>
+        <td class="cost-num" style="color:var(--gold);font-size:18px">~$199/month</td>
+        <td class="cost-savings" style="color:var(--gold);font-size:14px">-98.1%</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Roadmap timeline -->
+  <div class="timeline-section fu4">
+    <div class="section-title">Technology Roadmap</div>
+    <div class="section-sub">15 initiatives across three build phases</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--green);color:var(--green)">✓</div>
+        <div class="tl-phase" style="color:var(--green)">Phase 1 · Built & Deployed</div>
+        <div class="tl-title">Foundations — AlphaCore, DD Engine, AutoOps</div>
+        <div class="tl-desc">Core investment data platform, automated due diligence, and operational automation. 19 Digital Analyst bots deployed. AWS serverless architecture established. Production since Jun 2024.</div>
+        <div class="tl-tags">
+          <span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">01 AlphaCore</span>
+          <span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">06 DD Engine</span>
+          <span class="tag" style="background:rgba(31,201,138,.1);color:var(--green)">13 AutoOps</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--blue);color:var(--blue)">2</div>
+        <div class="tl-phase" style="color:var(--blue)">Phase 2 · In Build</div>
+        <div class="tl-title">Investment Intelligence & Investor Relations</div>
+        <div class="tl-desc">Deal Flow Intelligence, Portfolio Monitor, Investor CRM, IC Workflow, and Automated Reporting. Full visibility from sourcing to LP distribution — all data in Athena, all workflows automated.</div>
+        <div class="tl-tags">
+          <span class="tag" style="background:rgba(74,124,255,.1);color:var(--blue)">02 Deal Flow</span>
+          <span class="tag" style="background:rgba(74,124,255,.1);color:var(--blue)">03 Investor CRM</span>
+          <span class="tag" style="background:rgba(74,124,255,.1);color:var(--blue)">04 Portfolio Monitor</span>
+          <span class="tag" style="background:rgba(74,124,255,.1);color:var(--blue)">07 IC Workflow</span>
+          <span class="tag" style="background:rgba(74,124,255,.1);color:var(--blue)">08 Reporting</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--muted);color:var(--muted)">3</div>
+        <div class="tl-phase" style="color:var(--muted)">Phase 3 · Planned</div>
+        <div class="tl-title">Data, Infrastructure & Security</div>
+        <div class="tl-desc">Data Warehouse, Risk Analytics, Knowledge Base, Secure Documents, Cloud IaC, and Cybersecurity Framework. The full platform at institutional quality, for $199/month total.</div>
+        <div class="tl-tags">
+          <span class="tag" style="background:var(--surf3);color:var(--muted)">05 Data Warehouse</span>
+          <span class="tag" style="background:var(--surf3);color:var(--muted)">09 Risk Analytics</span>
+          <span class="tag" style="background:var(--surf3);color:var(--muted)">10 Knowledge Base</span>
+          <span class="tag" style="background:var(--surf3);color:var(--muted)">11 Secure Docs</span>
+          <span class="tag" style="background:var(--surf3);color:var(--muted)">12 Cloud IaC</span>
+          <span class="tag" style="background:var(--surf3);color:var(--muted)">14 Cybersecurity</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<div class="pg-footer">
+  <span>Prime Alpha Securities</span> &nbsp;·&nbsp; Strategic Technology Vision &nbsp;·&nbsp; Alternative Investment Fund Manager &nbsp;·&nbsp; African Markets &nbsp;·&nbsp; Confidential
+</div>
+</div>
+<script>
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+}
+</script>
+</body>
+</html>

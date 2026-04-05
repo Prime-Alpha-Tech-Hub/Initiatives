@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Data Ingestion | Data Warehouse | PAS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--acc:#f04166;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .2s ease both}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100;gap:8px}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);margin-right:4px}
+.nav-sep{color:var(--border);margin:0 4px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc);background:rgba(240,65,102,.08);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--blue);color:var(--text)}
+.main{flex:1;padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.pg-hd{margin-bottom:24px}.pg-hd h1{font-size:20px;font-weight:700;margin-bottom:4px}.pg-hd p{font-size:13px;color:var(--muted)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{opacity:.85}
+.btn-s{background:var(--surf2);border:1px solid var(--border);color:var(--text)}.btn-s:hover{border-color:var(--blue);color:var(--blue)}
+.btn-g{background:rgba(31,201,138,.12);color:var(--green);border:1px solid rgba(31,201,138,.2)}.btn-g:hover{background:rgba(31,201,138,.2)}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.mbox{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.mlbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.mval{font-family:var(--ffm);font-size:22px;font-weight:700}
+.msub{font-size:11px;color:var(--muted);margin-top:3px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-g{background:rgba(31,201,138,.12);color:var(--green)}
+.tag-r{background:rgba(240,65,102,.12);color:var(--red)}
+.tag-a{background:rgba(245,158,11,.12);color:var(--amber)}
+.tag-b{background:rgba(74,124,255,.12);color:var(--blue)}
+.tag-p{background:rgba(167,139,250,.12);color:var(--purple)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px;width:500px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.mclose{font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.mclose:hover{color:var(--text)}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.finp,.fsel,.ftxt{width:100%;padding:8px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s;margin-bottom:12px}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--blue)}
+.ftxt{min-height:80px;resize:vertical}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(240,65,102,.1);font-size:11px;color:var(--muted);margin-top:auto}
+.pg-footer b{color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .12s;color:var(--muted)}
+.chip:hover,.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(240,65,102,.08)}
+.progress-bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.code-block{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-family:var(--ffm);font-size:12px;color:var(--green);overflow-x:auto;white-space:pre}
+</style>
+</head><nav class="topnav">
+  <a href="../index.html" class="tl-btn">← Roadmap</a>
+  <span class="nav-logo">05</span>
+  <span class="nav-sep">|</span>
+  <span style="font-size:12px;color:var(--muted);margin-right:12px">Data Warehouse</span>
+  <div class="nav-links">
+    <a href="explorer.html" class="nav-item ">Explorer</a>
+    <a href="queries.html" class="nav-item ">Saved Queries</a>
+    <a href="ingestion.html" class="nav-item active">Ingestion</a>
+    <a href="catalog.html" class="nav-item ">Data Catalog</a>
+    <a href="cost.html" class="nav-item ">Cost</a>
+  </div>
+  <div class="nav-right">
+    <button class="tl-btn" onclick="toggleTheme()">🌓 Theme</button>
+  </div>
+</nav>
+<body><div class="main fu">
+<div class="pg-hd" style="display:flex;align-items:center;justify-content:space-between">
+  <div><h1>Data Ingestion</h1><p>Glue ETL jobs, S3 event triggers, and FRED API sync pipelines</p></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-s" onclick="refreshAll()">⟳ Refresh All</button>
+    <button class="btn btn-p" onclick="openM('add-job-modal')">+ Add Job</button>
+  </div>
+</div>
+<div class="grid g4" style="margin-bottom:20px">
+  <div class="mbox"><div class="mlbl">Active Jobs</div><div class="mval" id="m-active">7</div><div class="msub">running now</div></div>
+  <div class="mbox"><div class="mlbl">Last Run</div><div class="mval">2m ago</div><div class="msub">FRED macro sync</div></div>
+  <div class="mbox"><div class="mlbl">Records Today</div><div class="mval" id="m-records">284K</div><div class="msub">ingested</div></div>
+  <div class="mbox"><div class="mlbl">Errors</div><div class="mval" style="color:var(--red)" id="m-errors">2</div><div class="msub">need attention</div></div>
+</div>
+<div class="card">
+  <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+    <span style="font-size:12px;font-weight:700">Ingestion Jobs</span>
+    <div style="flex:1"></div>
+    <span class="chip on" onclick="toggleChip2(this,'all')">All</span>
+    <span class="chip" onclick="toggleChip2(this,'running')">Running</span>
+    <span class="chip" onclick="toggleChip2(this,'error')">Errors</span>
+    <span class="chip" onclick="toggleChip2(this,'scheduled')">Scheduled</span>
+  </div>
+  <table><thead><tr><th>Job Name</th><th>Source</th><th>Target</th><th>Schedule</th><th>Last Run</th><th>Status</th><th>Records</th><th>Actions</th></tr></thead>
+  <tbody id="jobs-tbody"></tbody></table>
+</div>
+<div class="modal-overlay" id="add-job-modal" onclick="if(event.target===this)closeM('add-job-modal')">
+  <div class="modal">
+    <div class="mtitle">Add Ingestion Job <button class="mclose" onclick="closeM('add-job-modal')">×</button></div>
+    <label class="flbl">Job Name</label><input class="finp" id="j-name" placeholder="e.g. CEMAC Trade Data Sync"/>
+    <label class="flbl">Source Type</label>
+    <select class="fsel" id="j-src"><option>S3 Event Trigger</option><option>FRED API</option><option>Bloomberg API</option><option>Refinitiv</option><option>Manual Upload</option><option>DynamoDB Stream</option></select>
+    <label class="flbl">Target Table</label><input class="finp" id="j-target" placeholder="schema.table_name"/>
+    <label class="flbl">Schedule (cron)</label><input class="finp" id="j-cron" placeholder="0 6 * * MON-FRI"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-s" onclick="closeM('add-job-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="addJob()">Create Job</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="logs-modal" onclick="if(event.target===this)closeM('logs-modal')">
+  <div class="modal" style="width:620px">
+    <div class="mtitle"><span id="log-title">Job Logs</span><button class="mclose" onclick="closeM('logs-modal')">×</button></div>
+    <div class="code-block" id="log-content" style="max-height:300px;overflow-y:auto"></div>
+    <div style="text-align:right;margin-top:12px"><button class="btn btn-s" onclick="closeM('logs-modal')">Close</button></div>
+  </div>
+</div><div class="toast" id="toast"></div>
+<script>
+function toast(m,c='#1fc98a'){const t=document.getElementById('toast');t.textContent=m;t.style.background=c;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pas-theme',h.dataset.theme)}
+(function(){const t=localStorage.getItem('pas-theme');if(t)document.documentElement.dataset.theme=t})();
+</script>
+<script>
+let jobs=[
+  {id:1,name:'Portfolio Positions Sync',src:'DynamoDB Stream',target:'portfolio.positions',sched:'Real-time',last:'1m ago',status:'running',records:'12.4K'},
+  {id:2,name:'FRED Macro Indicators',src:'FRED API',target:'market.fred_series',sched:'0 6 * * 1-5',last:'2m ago',status:'running',records:'842'},
+  {id:3,name:'Deal Docs OCR',src:'S3 Event Trigger',target:'deals.deal_docs',sched:'On upload',last:'14m ago',status:'running',records:'23'},
+  {id:4,name:'LP Capital Calls ETL',src:'DynamoDB Stream',target:'investors.capital_calls',sched:'Real-time',last:'4m ago',status:'running',records:'5.1K'},
+  {id:5,name:'FX Rates Ingestion',src:'Bloomberg API',target:'market.fx_rates',sched:'0 */4 * * *',last:'3h ago',status:'scheduled',records:'2.8K'},
+  {id:6,name:'Commodity Prices',src:'Refinitiv',target:'market.commodity_prices',sched:'0 8 * * 1-5',last:'5h ago',status:'scheduled',records:'4.2K'},
+  {id:7,name:'Covenant Monitoring',src:'Manual Upload',target:'portfolio.covenants',sched:'Weekly',last:'2d ago',status:'error',records:'—'},
+  {id:8,name:'Audit Log Archival',src:'S3 Event Trigger',target:'audit.access_logs',sched:'Real-time',last:'8m ago',status:'running',records:'91K'},
+];
+let activeFilter='all';
+const STATMAP={running:'tag-g',scheduled:'tag-b',error:'tag-r'};
+function toggleChip2(el,f){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');activeFilter=f;renderJobs();
+}
+function renderJobs(){
+  let data=jobs;
+  if(activeFilter!=='all')data=data.filter(j=>j.status===activeFilter);
+  document.getElementById('jobs-tbody').innerHTML=data.map(j=>`
+    <tr>
+      <td><strong>${j.name}</strong></td>
+      <td style="font-size:12px">${j.src}</td>
+      <td><span style="font-family:var(--ffm);font-size:11px">${j.target}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${j.sched}</td>
+      <td style="font-size:12px">${j.last}</td>
+      <td><span class="tag ${STATMAP[j.status]}">${j.status}</span></td>
+      <td style="font-family:var(--ffm);font-size:12px">${j.records}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-s" style="font-size:11px;padding:4px 10px" onclick="runJob(${j.id})">▶ Run</button>
+          <button class="btn btn-s" style="font-size:11px;padding:4px 10px" onclick="showLogs(${j.id})">Logs</button>
+          ${j.status==='error'?`<button class="btn" style="color:var(--green);font-size:11px" onclick="fixJob(${j.id})">Fix</button>`:''}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function runJob(id){
+  const j=jobs.find(x=>x.id===id);
+  j.status='running';j.last='just now';renderJobs();
+  toast(`Job "${j.name}" started`);
+  setTimeout(()=>{j.last='<1m ago';renderJobs()},2000);
+}
+function fixJob(id){
+  const j=jobs.find(x=>x.id===id);j.status='scheduled';
+  document.getElementById('m-errors').textContent=Math.max(0,parseInt(document.getElementById('m-errors').textContent)-1);
+  renderJobs();toast(`Job "${j.name}" reconfigured ✓`);
+}
+function showLogs(id){
+  const j=jobs.find(x=>x.id===id);
+  document.getElementById('log-title').textContent=j.name+' — Logs';
+  const lines=['[INFO] 2026-04-05 06:00:01 Job started','[INFO] 2026-04-05 06:00:02 Connecting to source: '+j.src,'[INFO] 2026-04-05 06:00:03 Fetching records...','[INFO] 2026-04-05 06:00:08 Batch 1/4 — 2500 records written to '+j.target,j.status==='error'?'[ERROR] 2026-04-05 06:00:09 Source file not found: s3://pas-data/covenants/2026-04-05.csv':'[INFO] 2026-04-05 06:00:12 All records processed','[INFO] 2026-04-05 06:00:12 Job complete'];
+  document.getElementById('log-content').textContent=lines.join('
+');
+  openM('logs-modal');
+}
+function refreshAll(){
+  toast('Refreshing all job statuses...');
+  setTimeout(()=>{document.getElementById('m-records').textContent='291K';toast('All jobs refreshed ✓')},1200);
+}
+function addJob(){
+  const n=document.getElementById('j-name').value;
+  if(!n){toast('Enter a job name','var(--red)');return}
+  jobs.unshift({id:Date.now(),name:n,src:document.getElementById('j-src').value,target:document.getElementById('j-target').value||'schema.table',sched:document.getElementById('j-cron').value||'Manual',last:'Never',status:'scheduled',records:'—'});
+  closeM('add-job-modal');renderJobs();
+  document.getElementById('m-active').textContent=parseInt(document.getElementById('m-active').textContent)+1;
+  toast('Job created ✓');
+}
+renderJobs();
+</script><footer class="pg-footer"><b>Prime Alpha Securities</b> · Data Warehouse · Confidential</footer></body></html>

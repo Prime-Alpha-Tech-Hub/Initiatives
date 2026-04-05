@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cost Management | Data Warehouse | PAS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--acc:#f04166;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .2s ease both}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100;gap:8px}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);margin-right:4px}
+.nav-sep{color:var(--border);margin:0 4px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc);background:rgba(240,65,102,.08);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--blue);color:var(--text)}
+.main{flex:1;padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.pg-hd{margin-bottom:24px}.pg-hd h1{font-size:20px;font-weight:700;margin-bottom:4px}.pg-hd p{font-size:13px;color:var(--muted)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{opacity:.85}
+.btn-s{background:var(--surf2);border:1px solid var(--border);color:var(--text)}.btn-s:hover{border-color:var(--blue);color:var(--blue)}
+.btn-g{background:rgba(31,201,138,.12);color:var(--green);border:1px solid rgba(31,201,138,.2)}.btn-g:hover{background:rgba(31,201,138,.2)}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.mbox{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.mlbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.mval{font-family:var(--ffm);font-size:22px;font-weight:700}
+.msub{font-size:11px;color:var(--muted);margin-top:3px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-g{background:rgba(31,201,138,.12);color:var(--green)}
+.tag-r{background:rgba(240,65,102,.12);color:var(--red)}
+.tag-a{background:rgba(245,158,11,.12);color:var(--amber)}
+.tag-b{background:rgba(74,124,255,.12);color:var(--blue)}
+.tag-p{background:rgba(167,139,250,.12);color:var(--purple)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px;width:500px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.mclose{font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.mclose:hover{color:var(--text)}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.finp,.fsel,.ftxt{width:100%;padding:8px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s;margin-bottom:12px}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--blue)}
+.ftxt{min-height:80px;resize:vertical}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(240,65,102,.1);font-size:11px;color:var(--muted);margin-top:auto}
+.pg-footer b{color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .12s;color:var(--muted)}
+.chip:hover,.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(240,65,102,.08)}
+.progress-bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.code-block{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-family:var(--ffm);font-size:12px;color:var(--green);overflow-x:auto;white-space:pre}
+</style>
+</head><nav class="topnav">
+  <a href="../index.html" class="tl-btn">← Roadmap</a>
+  <span class="nav-logo">05</span>
+  <span class="nav-sep">|</span>
+  <span style="font-size:12px;color:var(--muted);margin-right:12px">Data Warehouse</span>
+  <div class="nav-links">
+    <a href="explorer.html" class="nav-item ">Explorer</a>
+    <a href="queries.html" class="nav-item ">Saved Queries</a>
+    <a href="ingestion.html" class="nav-item ">Ingestion</a>
+    <a href="catalog.html" class="nav-item ">Data Catalog</a>
+    <a href="cost.html" class="nav-item active">Cost</a>
+  </div>
+  <div class="nav-right">
+    <button class="tl-btn" onclick="toggleTheme()">🌓 Theme</button>
+  </div>
+</nav>
+<body><div class="main fu">
+<div class="pg-hd" style="display:flex;align-items:center;justify-content:space-between">
+  <div><h1>Cost Management</h1><p>Athena query costs, S3 storage, and Glue job billing</p></div>
+  <div style="display:flex;gap:8px">
+    <select class="fsel" style="width:160px;margin:0" id="period-sel" onchange="changePeriod(this.value)">
+      <option value="mtd">Month to Date</option>
+      <option value="last30">Last 30 Days</option>
+      <option value="quarter">This Quarter</option>
+      <option value="ytd">Year to Date</option>
+    </select>
+    <button class="btn btn-s" onclick="exportCostReport()">↓ Export</button>
+    <button class="btn btn-p" onclick="openM('budget-modal')">Set Budget Alert</button>
+  </div>
+</div>
+<div class="grid g4" style="margin-bottom:20px">
+  <div class="mbox"><div class="mlbl">Total Cost MTD</div><div class="mval" id="m-total">$47.82</div><div class="msub" style="color:var(--green)">↓ 12% vs last month</div></div>
+  <div class="mbox"><div class="mlbl">Athena Queries</div><div class="mval" id="m-athena">$18.24</div><div class="msub">38% of total</div></div>
+  <div class="mbox"><div class="mlbl">S3 Storage</div><div class="mval" id="m-s3">$21.40</div><div class="msub">45% of total</div></div>
+  <div class="mbox"><div class="mlbl">Glue ETL</div><div class="mval" id="m-glue">$8.18</div><div class="msub">17% of total</div></div>
+</div>
+<div class="grid g2" style="margin-bottom:16px">
+  <div class="card" style="padding:16px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:14px">Daily Cost Trend</div>
+    <canvas id="cost-chart" height="180"></canvas>
+  </div>
+  <div class="card" style="padding:16px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:14px">Cost by Service</div>
+    <canvas id="pie-chart" height="180"></canvas>
+  </div>
+</div>
+<div class="card">
+  <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><span style="font-size:12px;font-weight:700">Top Cost Drivers</span></div>
+  <table><thead><tr><th>Resource</th><th>Service</th><th>Usage</th><th>Unit Cost</th><th>Total</th><th>Trend</th></tr></thead>
+  <tbody id="cost-tbody"></tbody></table>
+</div>
+<div class="modal-overlay" id="budget-modal" onclick="if(event.target===this)closeM('budget-modal')">
+  <div class="modal">
+    <div class="mtitle">Set Budget Alert <button class="mclose" onclick="closeM('budget-modal')">×</button></div>
+    <label class="flbl">Monthly Budget ($)</label><input class="finp" id="b-amt" value="150"/>
+    <label class="flbl">Alert at (%)</label><input class="finp" id="b-pct" value="80"/>
+    <label class="flbl">Notify</label><select class="fsel"><option>j.botouli@primealphasecurities.com</option><option>All Founders</option></select>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-s" onclick="closeM('budget-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="saveBudget()">Save Alert</button>
+    </div>
+  </div>
+</div><div class="toast" id="toast"></div>
+<script>
+function toast(m,c='#1fc98a'){const t=document.getElementById('toast');t.textContent=m;t.style.background=c;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pas-theme',h.dataset.theme)}
+(function(){const t=localStorage.getItem('pas-theme');if(t)document.documentElement.dataset.theme=t})();
+</script>
+<script>
+const costRows=[
+  {resource:'portfolio.positions full scan',svc:'Athena',usage:'142 GB scanned',unit:'$5/TB',total:'$0.71',trend:'+3%'},
+  {resource:'pas-data-lake S3 bucket',svc:'S3',usage:'482 GB stored',unit:'$0.023/GB',total:'$11.09',trend:'+2%'},
+  {resource:'deals.pipeline analytics',svc:'Athena',usage:'89 GB scanned',unit:'$5/TB',total:'$0.44',trend:'−8%'},
+  {resource:'Portfolio ETL Glue job',svc:'Glue',usage:'4.2 DPU-hours',unit:'$0.44/DPU-hr',total:'$1.85',trend:'+0%'},
+  {resource:'market.fred_series storage',svc:'S3',usage:'28 GB stored',unit:'$0.023/GB',total:'$0.64',trend:'+5%'},
+  {resource:'FRED Sync Glue job',svc:'Glue',usage:'2.1 DPU-hours',unit:'$0.44/DPU-hr',total:'$0.92',trend:'−2%'},
+  {resource:'audit.access_logs archival',svc:'S3 Glacier',usage:'91 GB',unit:'$0.004/GB',total:'$0.36',trend:'+12%'},
+];
+document.getElementById('cost-tbody').innerHTML=costRows.map(r=>`
+  <tr>
+    <td><span style="font-family:var(--ffm);font-size:12px">${r.resource}</span></td>
+    <td><span class="tag tag-b">${r.svc}</span></td>
+    <td style="font-size:12px">${r.usage}</td>
+    <td style="font-size:12px">${r.unit}</td>
+    <td style="font-family:var(--ffm);font-weight:700">${r.total}</td>
+    <td style="color:${r.trend.startsWith('+')?'var(--amber)':'var(--green)'};">${r.trend}</td>
+  </tr>`).join('');
+const days=['1','5','10','15','20','25','30'];
+const vals=[4.2,8.7,12.1,18.4,22.8,38.6,47.82];
+const ctx1=document.getElementById('cost-chart').getContext('2d');
+new Chart(ctx1,{type:'line',data:{labels:days,datasets:[{label:'Cumulative Cost ($)',data:vals,borderColor:'#f04166',backgroundColor:'rgba(240,65,102,.08)',fill:true,tension:.3,pointRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#566382',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#566382',font:{size:10},callback:v=>'$'+v}}}}});
+const ctx2=document.getElementById('pie-chart').getContext('2d');
+new Chart(ctx2,{type:'doughnut',data:{labels:['Athena','S3 Storage','Glue ETL','S3 Glacier'],datasets:[{data:[18.24,21.40,8.18,0.36],backgroundColor:['#f04166','#4a7cff','#1fc98a','#a78bfa'],borderWidth:2,borderColor:'#0d1119'}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#566382',font:{size:11},padding:12}}},cutout:'65%'}});
+function changePeriod(p){
+  const mult={mtd:1,last30:1.08,quarter:2.9,ytd:8.4}[p]||1;
+  document.getElementById('m-total').textContent='$'+(47.82*mult).toFixed(2);
+  toast('Cost period updated');
+}
+function exportCostReport(){toast('Exporting cost report to S3... ✓')}
+function saveBudget(){
+  const amt=document.getElementById('b-amt').value;
+  const pct=document.getElementById('b-pct').value;
+  closeM('budget-modal');
+  toast(`Budget alert set: $${amt} at ${pct}%`);
+}
+</script><footer class="pg-footer"><b>Prime Alpha Securities</b> · Data Warehouse · Confidential</footer></body></html>

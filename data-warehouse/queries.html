@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Saved Queries | Data Warehouse | PAS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--acc:#f04166;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .2s ease both}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100;gap:8px}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);margin-right:4px}
+.nav-sep{color:var(--border);margin:0 4px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc);background:rgba(240,65,102,.08);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--blue);color:var(--text)}
+.main{flex:1;padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.pg-hd{margin-bottom:24px}.pg-hd h1{font-size:20px;font-weight:700;margin-bottom:4px}.pg-hd p{font-size:13px;color:var(--muted)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{opacity:.85}
+.btn-s{background:var(--surf2);border:1px solid var(--border);color:var(--text)}.btn-s:hover{border-color:var(--blue);color:var(--blue)}
+.btn-g{background:rgba(31,201,138,.12);color:var(--green);border:1px solid rgba(31,201,138,.2)}.btn-g:hover{background:rgba(31,201,138,.2)}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.mbox{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.mlbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.mval{font-family:var(--ffm);font-size:22px;font-weight:700}
+.msub{font-size:11px;color:var(--muted);margin-top:3px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-g{background:rgba(31,201,138,.12);color:var(--green)}
+.tag-r{background:rgba(240,65,102,.12);color:var(--red)}
+.tag-a{background:rgba(245,158,11,.12);color:var(--amber)}
+.tag-b{background:rgba(74,124,255,.12);color:var(--blue)}
+.tag-p{background:rgba(167,139,250,.12);color:var(--purple)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px;width:500px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.mclose{font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.mclose:hover{color:var(--text)}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.finp,.fsel,.ftxt{width:100%;padding:8px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s;margin-bottom:12px}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--blue)}
+.ftxt{min-height:80px;resize:vertical}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(240,65,102,.1);font-size:11px;color:var(--muted);margin-top:auto}
+.pg-footer b{color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .12s;color:var(--muted)}
+.chip:hover,.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(240,65,102,.08)}
+.progress-bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.code-block{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-family:var(--ffm);font-size:12px;color:var(--green);overflow-x:auto;white-space:pre}
+</style>
+</head><nav class="topnav">
+  <a href="../index.html" class="tl-btn">← Roadmap</a>
+  <span class="nav-logo">05</span>
+  <span class="nav-sep">|</span>
+  <span style="font-size:12px;color:var(--muted);margin-right:12px">Data Warehouse</span>
+  <div class="nav-links">
+    <a href="explorer.html" class="nav-item ">Explorer</a>
+    <a href="queries.html" class="nav-item active">Saved Queries</a>
+    <a href="ingestion.html" class="nav-item ">Ingestion</a>
+    <a href="catalog.html" class="nav-item ">Data Catalog</a>
+    <a href="cost.html" class="nav-item ">Cost</a>
+  </div>
+  <div class="nav-right">
+    <button class="tl-btn" onclick="toggleTheme()">🌓 Theme</button>
+  </div>
+</nav>
+<body><div class="main fu">
+<div class="pg-hd" style="display:flex;align-items:center;justify-content:space-between">
+  <div><h1>Saved Queries</h1><p>Reusable query library shared across the team</p></div>
+  <div style="display:flex;gap:8px">
+    <input class="finp" style="width:220px;margin:0" placeholder="Search queries..." oninput="filterQ(this.value)" id="q-search"/>
+    <button class="btn btn-p" onclick="openM('new-q-modal')">+ New Query</button>
+  </div>
+</div>
+<div style="margin:16px 0;display:flex;gap:8px;flex-wrap:wrap" id="tag-filters">
+  <span class="chip on" onclick="toggleChip(this,'all')">All</span>
+  <span class="chip" onclick="toggleChip(this,'portfolio')">Portfolio</span>
+  <span class="chip" onclick="toggleChip(this,'risk')">Risk</span>
+  <span class="chip" onclick="toggleChip(this,'investors')">Investors</span>
+  <span class="chip" onclick="toggleChip(this,'deals')">Deals</span>
+  <span class="chip" onclick="toggleChip(this,'market')">Market</span>
+</div>
+<div id="q-list" class="grid" style="grid-template-columns:1fr;gap:10px"></div>
+</div>
+<div class="modal-overlay" id="new-q-modal" onclick="if(event.target===this)closeM('new-q-modal')">
+  <div class="modal">
+    <div class="mtitle">New Saved Query <button class="mclose" onclick="closeM('new-q-modal')">×</button></div>
+    <label class="flbl">Name</label><input class="finp" id="nq-name" placeholder="e.g. IRR by Vintage Year"/>
+    <label class="flbl">Description</label><input class="finp" id="nq-desc" placeholder="Brief description"/>
+    <label class="flbl">Tags (comma separated)</label><input class="finp" id="nq-tags" placeholder="portfolio, irr"/>
+    <label class="flbl">SQL</label>
+    <textarea class="ftxt" id="nq-sql" style="font-family:var(--ffm);color:var(--green)" placeholder="SELECT ..."></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-s" onclick="closeM('new-q-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="addQuery()">Save Query</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="view-q-modal" onclick="if(event.target===this)closeM('view-q-modal')">
+  <div class="modal" style="width:600px">
+    <div class="mtitle"><span id="vq-title">Query</span><button class="mclose" onclick="closeM('view-q-modal')">×</button></div>
+    <div id="vq-desc" style="font-size:13px;color:var(--muted);margin-bottom:12px"></div>
+    <div class="code-block" id="vq-sql"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-s" onclick="closeM('view-q-modal')">Close</button>
+      <button class="btn btn-g" onclick="openInExplorer()">Open in Explorer</button>
+    </div>
+  </div>
+</div><div class="toast" id="toast"></div>
+<script>
+function toast(m,c='#1fc98a'){const t=document.getElementById('toast');t.textContent=m;t.style.background=c;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pas-theme',h.dataset.theme)}
+(function(){const t=localStorage.getItem('pas-theme');if(t)document.documentElement.dataset.theme=t})();
+</script>
+<script>
+let queries=[
+  {id:1,name:'Portfolio NAV Summary',desc:'Total NAV and allocation by strategy',tags:['portfolio'],runs:142,owner:'J. Botouli',sql:'SELECT strategy, SUM(nav_usd) as total_nav, COUNT(*) as positions\nFROM portfolio.positions\nGROUP BY strategy ORDER BY total_nav DESC'},
+  {id:2,name:'Monthly IRR Trend',desc:'IRR evolution over last 12 months',tags:['portfolio','risk'],runs:89,owner:'N.D. Ikoué',sql:'SELECT month, AVG(irr_pct) as avg_irr, strategy\nFROM portfolio.returns\nWHERE month >= DATE_ADD(MONTH,-12,CURRENT_DATE)\nGROUP BY month,strategy ORDER BY month'},
+  {id:3,name:'Capital Calls Overdue',desc:'LPs with outstanding capital calls past due date',tags:['investors'],runs:67,owner:'B. Ibrahima',sql:'SELECT lp_name, amount_due, due_date, days_overdue\nFROM investors.capital_calls\nWHERE paid=false AND due_date < CURRENT_DATE\nORDER BY days_overdue DESC'},
+  {id:4,name:'VaR Daily Report',desc:'Value-at-risk aggregated by strategy and confidence',tags:['risk'],runs:201,owner:'J. Botouli',sql:'SELECT strategy, confidence_pct, var_usd, CURRENT_DATE as report_date\nFROM risk.var_daily\nORDER BY confidence_pct, strategy'},
+  {id:5,name:'Deal Pipeline Velocity',desc:'Avg days per deal stage over rolling 90d',tags:['deals'],runs:34,owner:'N.D. Ikoué',sql:'SELECT stage, AVG(days_in_stage) as avg_days, COUNT(*) as deals\nFROM deals.pipeline WHERE entry_date >= DATE_ADD(DAY,-90,CURRENT_DATE)\nGROUP BY stage ORDER BY avg_days DESC'},
+  {id:6,name:'FRED Macro Snapshot',desc:'Latest macro indicators from FRED series',tags:['market'],runs:56,owner:'J. Botouli',sql:'SELECT series_id, series_name, latest_value, unit, updated_at\nFROM market.fred_series\nWHERE active=true ORDER BY series_name'},
+];
+let activeTag='all';
+function filterQ(v){renderQ(v)}
+function toggleChip(el,tag){
+  document.querySelectorAll('#tag-filters .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');activeTag=tag;renderQ(document.getElementById('q-search').value);
+}
+function renderQ(search=''){
+  let data=queries;
+  if(activeTag!=='all')data=data.filter(q=>q.tags.includes(activeTag));
+  if(search)data=data.filter(q=>q.name.toLowerCase().includes(search.toLowerCase())||q.desc.toLowerCase().includes(search.toLowerCase()));
+  document.getElementById('q-list').innerHTML=data.map(q=>`
+    <div class="card" style="padding:14px 16px;display:flex;align-items:center;gap:14px">
+      <div style="flex:1">
+        <div style="font-weight:700;margin-bottom:3px">${q.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${q.desc}</div>
+        <div style="margin-top:8px;display:flex;gap:6px">${q.tags.map(t=>`<span class="tag tag-b">${t}</span>`).join('')}</div>
+      </div>
+      <div style="text-align:center;min-width:60px"><div style="font-family:var(--ffm);font-size:16px;font-weight:700">${q.runs}</div><div style="font-size:10px;color:var(--muted)">runs</div></div>
+      <div style="font-size:11px;color:var(--muted)">${q.owner}</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-s" onclick="viewQ(${q.id})">View SQL</button>
+        <button class="btn btn-g" onclick="runQ(${q.id})">▶ Run</button>
+        <button class="btn" style="color:var(--red)" onclick="deleteQ(${q.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function viewQ(id){
+  const q=queries.find(x=>x.id===id);
+  document.getElementById('vq-title').textContent=q.name;
+  document.getElementById('vq-desc').textContent=q.desc;
+  document.getElementById('vq-sql').textContent=q.sql;
+  openM('view-q-modal');
+}
+function runQ(id){
+  const q=queries.find(x=>x.id===id);
+  q.runs++;renderQ();
+  toast(`Running "${q.name}"... ✓ completed in ${(Math.random()*.8+.3).toFixed(2)}s`);
+}
+function deleteQ(id){queries=queries.filter(x=>x.id!==id);renderQ();toast('Query deleted','var(--red)')}
+function addQuery(){
+  const n=document.getElementById('nq-name').value;
+  if(!n){toast('Enter a name','var(--red)');return}
+  queries.unshift({id:Date.now(),name:n,desc:document.getElementById('nq-desc').value,
+    tags:document.getElementById('nq-tags').value.split(',').map(t=>t.trim()),
+    runs:0,owner:'J. Botouli',sql:document.getElementById('nq-sql').value});
+  closeM('new-q-modal');renderQ();toast('Query saved ✓');
+}
+function openInExplorer(){closeM('view-q-modal');window.location.href='explorer.html'}
+renderQ();
+</script><footer class="pg-footer"><b>Prime Alpha Securities</b> · Data Warehouse · Confidential</footer></body></html>

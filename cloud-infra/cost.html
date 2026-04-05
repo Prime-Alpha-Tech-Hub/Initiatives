@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cost | Cloud Infra | PAS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--acc:#566382;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .2s ease both}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100;gap:8px}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);margin-right:4px}
+.nav-sep{color:var(--border);margin:0 4px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc);background:rgba(74,124,255,.08);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--acc);color:var(--text)}
+.main{flex:1;padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.pg-hd{margin-bottom:24px}.pg-hd h1{font-size:20px;font-weight:700;margin-bottom:4px}.pg-hd p{font-size:13px;color:var(--muted)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{opacity:.85}
+.btn-s{background:var(--surf2);border:1px solid var(--border);color:var(--text)}.btn-s:hover{border-color:var(--acc);color:var(--acc)}
+.btn-g{background:rgba(31,201,138,.12);color:var(--green);border:1px solid rgba(31,201,138,.2)}.btn-g:hover{background:rgba(31,201,138,.2)}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.mbox{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.mlbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.mval{font-family:var(--ffm);font-size:22px;font-weight:700}
+.msub{font-size:11px;color:var(--muted);margin-top:3px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-g{background:rgba(31,201,138,.12);color:var(--green)}
+.tag-r{background:rgba(240,65,102,.12);color:var(--red)}
+.tag-a{background:rgba(245,158,11,.12);color:var(--amber)}
+.tag-b{background:rgba(74,124,255,.12);color:var(--blue)}
+.tag-p{background:rgba(167,139,250,.12);color:var(--purple)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px;width:500px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.mclose{font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.mclose:hover{color:var(--text)}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.finp,.fsel,.ftxt{width:100%;padding:8px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s;margin-bottom:12px}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--acc)}
+.ftxt{min-height:80px;resize:vertical}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(74,124,255,.1);font-size:11px;color:var(--muted);margin-top:auto}
+.pg-footer b{color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .12s;color:var(--muted)}
+.chip:hover,.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(74,124,255,.08)}
+.progress-bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.code-block{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-family:var(--ffm);font-size:12px;color:var(--green);overflow-x:auto;white-space:pre}
+.sidebar{width:240px;background:var(--surf);border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:4px}
+.sb-item{padding:8px 12px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:8px}
+.sb-item:hover{background:var(--surf2);color:var(--text)}
+.sb-item.active{background:rgba(74,124,255,.1);color:var(--acc);font-weight:700}
+</style>
+</head><nav class="topnav">
+  <a href="../index.html" class="tl-btn">← Roadmap</a>
+  <span class="nav-logo">12</span>
+  <span class="nav-sep">|</span>
+  <span style="font-size:12px;color:var(--muted);margin-right:12px">Cloud Infra</span>
+  <div class="nav-links"><a href="pipeline.html" class="nav-item ">CI/CD</a><a href="resources.html" class="nav-item ">Resources</a><a href="cost.html" class="nav-item active">Cost</a><a href="terraform.html" class="nav-item ">Terraform</a><a href="layers.html" class="nav-item ">Architecture</a></div>
+  <div class="nav-right">
+    <button class="tl-btn" onclick="toggleTheme()">🌓 Theme</button>
+  </div>
+</nav>
+<body><div class="main fu">
+<div class="pg-hd"><h1>Cloud Cost</h1><p>AWS Cost Explorer — spend tracking and optimisation recommendations</p></div>
+<div class="grid g4" style="margin-bottom:20px">
+  <div class="mbox"><div class="mlbl">MTD Spend</div><div class="mval">$287</div><div class="msub">vs $310 last month</div></div>
+  <div class="mbox"><div class="mlbl">Projected (Nov)</div><div class="mval" style="color:var(--amber)">$312</div></div>
+  <div class="mbox"><div class="mlbl">Savings vs On-Demand</div><div class="mval" style="color:var(--green)">$84</div><div class="msub">reserved instances</div></div>
+  <div class="mbox"><div class="mlbl">Budget Alert</div><div class="mval" style="color:var(--green)">OK</div><div class="msub">under $400 limit</div></div>
+</div>
+<div class="card" style="padding:16px;margin-bottom:16px">
+  <div style="font-size:12px;font-weight:700;margin-bottom:12px;color:var(--muted)">MONTHLY SPEND (USD)</div>
+  <canvas id="cost-chart" height="160"></canvas>
+</div>
+<div class="card" style="padding:16px">
+  <div style="font-size:12px;font-weight:700;margin-bottom:12px;color:var(--muted)">SPEND BY SERVICE</div>
+  <table>
+    <thead><tr><th>Service</th><th>MTD</th><th>Last Month</th><th>Change</th><th>% of Total</th></tr></thead>
+    <tbody>
+      <tr><td>EC2</td><td>$78</td><td>$82</td><td style="color:var(--green)">-5%</td><td><div class="progress-bar" style="width:200px"><div class="progress-fill" style="width:27%;background:var(--blue)"></div></div></td></tr>
+      <tr><td>ALB</td><td>$48</td><td>$48</td><td style="color:var(--muted)">0%</td><td><div class="progress-bar" style="width:200px"><div class="progress-fill" style="width:17%;background:var(--blue)"></div></div></td></tr>
+      <tr><td>Lambda</td><td>$62</td><td>$71</td><td style="color:var(--green)">-13%</td><td><div class="progress-bar" style="width:200px"><div class="progress-fill" style="width:22%;background:var(--purple)"></div></div></td></tr>
+      <tr><td>DynamoDB</td><td>$34</td><td>$31</td><td style="color:var(--red)">+10%</td><td><div class="progress-bar" style="width:200px"><div class="progress-fill" style="width:12%;background:var(--amber)"></div></div></td></tr>
+      <tr><td>S3 + Transfer</td><td>$28</td><td>$26</td><td style="color:var(--red)">+8%</td><td><div class="progress-bar" style="width:200px"><div class="progress-fill" style="width:10%;background:var(--green)"></div></div></td></tr>
+      <tr><td>Other</td><td>$37</td><td>$52</td><td style="color:var(--green)">-29%</td><td><div class="progress-bar" style="width:200px"><div class="progress-fill" style="width:13%;background:var(--muted)"></div></div></td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+<footer class="pg-footer"><b>Prime Alpha Securities</b> &nbsp;·&nbsp; Cloud Infra &nbsp;·&nbsp; Confidential</footer>
+<script>
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pas-theme',h.dataset.theme)}
+(function(){const t=localStorage.getItem('pas-theme');if(t)document.documentElement.dataset.theme=t})();
+function toast(msg,type='info'){const c={'info':'#4a7cff','success':'#1fc98a','error':'#f04166','warn':'#f59e0b'};let t=document.getElementById('_toast');if(!t){t=document.createElement('div');t.id='_toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.style.background=c[type]||c.info;t.style.color='#fff';void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'))})
+</script>
+<script>
+new Chart(document.getElementById("cost-chart"),{type:"line",data:{labels:["Jun","Jul","Aug","Sep","Oct","Nov (proj)"],datasets:[{label:"Spend ($)",data:[198,224,248,271,310,312],borderColor:"#566382",backgroundColor:"rgba(86,99,130,.15)",fill:true,tension:.4,pointBackgroundColor:"#566382"}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:"rgba(255,255,255,.05)"},ticks:{color:"#566382",callback:v=>"$"+v}},x:{grid:{display:false},ticks:{color:"#566382"}}}}});
+</script></body></html>

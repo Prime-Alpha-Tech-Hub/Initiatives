@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Audit | IC Workflow | PAS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--acc:#c9a84c;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .2s ease both}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:100;gap:8px}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);margin-right:4px}
+.nav-sep{color:var(--border);margin:0 4px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc);background:rgba(74,124,255,.08);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--acc);color:var(--text)}
+.main{flex:1;padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.pg-hd{margin-bottom:24px}.pg-hd h1{font-size:20px;font-weight:700;margin-bottom:4px}.pg-hd p{font-size:13px;color:var(--muted)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{opacity:.85}
+.btn-s{background:var(--surf2);border:1px solid var(--border);color:var(--text)}.btn-s:hover{border-color:var(--acc);color:var(--acc)}
+.btn-g{background:rgba(31,201,138,.12);color:var(--green);border:1px solid rgba(31,201,138,.2)}.btn-g:hover{background:rgba(31,201,138,.2)}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.mbox{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px}
+.mlbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.mval{font-family:var(--ffm);font-size:22px;font-weight:700}
+.msub{font-size:11px;color:var(--muted);margin-top:3px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-g{background:rgba(31,201,138,.12);color:var(--green)}
+.tag-r{background:rgba(240,65,102,.12);color:var(--red)}
+.tag-a{background:rgba(245,158,11,.12);color:var(--amber)}
+.tag-b{background:rgba(74,124,255,.12);color:var(--blue)}
+.tag-p{background:rgba(167,139,250,.12);color:var(--purple)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px;width:500px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.mclose{font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.mclose:hover{color:var(--text)}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.finp,.fsel,.ftxt{width:100%;padding:8px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s;margin-bottom:12px}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--acc)}
+.ftxt{min-height:80px;resize:vertical}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(74,124,255,.1);font-size:11px;color:var(--muted);margin-top:auto}
+.pg-footer b{color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .12s;color:var(--muted)}
+.chip:hover,.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(74,124,255,.08)}
+.progress-bar{height:6px;background:var(--dim);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.code-block{background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-family:var(--ffm);font-size:12px;color:var(--green);overflow-x:auto;white-space:pre}
+.sidebar{width:240px;background:var(--surf);border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:4px}
+.sb-item{padding:8px 12px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:8px}
+.sb-item:hover{background:var(--surf2);color:var(--text)}
+.sb-item.active{background:rgba(74,124,255,.1);color:var(--acc);font-weight:700}
+</style>
+</head><nav class="topnav">
+  <a href="../index.html" class="tl-btn">← Roadmap</a>
+  <span class="nav-logo">07</span>
+  <span class="nav-sep">|</span>
+  <span style="font-size:12px;color:var(--muted);margin-right:12px">IC Workflow</span>
+  <div class="nav-links"><a href="submit.html" class="nav-item ">Submit</a><a href="committee.html" class="nav-item ">Committee</a><a href="pending.html" class="nav-item ">Pending</a><a href="approved.html" class="nav-item ">Approved</a><a href="audit.html" class="nav-item active">Audit</a></div>
+  <div class="nav-right">
+    <button class="tl-btn" onclick="toggleTheme()">🌓 Theme</button>
+  </div>
+</nav>
+<body><div class="main fu">
+<div class="pg-hd"><h1>Audit Trail</h1><p>Immutable log of all IC workflow events — submissions, votes, approvals</p></div>
+<div class="card" style="margin-bottom:16px;padding:14px;display:flex;gap:10px;align-items:center">
+  <input class="finp" style="margin:0;flex:1" placeholder="Filter by deal, user, or event type…" oninput="filterLog(this.value)"/>
+  <select class="fsel" style="margin:0;width:160px" id="evt-filter" onchange="filterLog(document.querySelector('.finp').value)">
+    <option value="">All Events</option>
+    <option>Submission</option>
+    <option>Vote</option>
+    <option>Approval</option>
+    <option>Rejection</option>
+    <option>Info Request</option>
+  </select>
+  <button class="btn btn-s" onclick="toast('Exporting audit log as CSV…','info');setTimeout(()=>toast('Export ready','success'),1400)">Export CSV</button>
+</div>
+<div class="card" id="log-container">
+  <table>
+    <thead><tr><th>Timestamp</th><th>Event</th><th>Deal</th><th>User</th><th>Details</th></tr></thead>
+    <tbody id="log-body"></tbody>
+  </table>
+</div>
+</div>
+<footer class="pg-footer"><b>Prime Alpha Securities</b> &nbsp;·&nbsp; IC Workflow &nbsp;·&nbsp; Confidential</footer>
+<script>
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pas-theme',h.dataset.theme)}
+(function(){const t=localStorage.getItem('pas-theme');if(t)document.documentElement.dataset.theme=t})();
+function toast(msg,type='info'){const c={'info':'#4a7cff','success':'#1fc98a','error':'#f04166','warn':'#f59e0b'};let t=document.getElementById('_toast');if(!t){t=document.createElement('div');t.id='_toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.style.background=c[type]||c.info;t.style.color='#fff';void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'))})
+</script>
+<script>
+const LOG=[
+  {ts:"2025-11-15 14:32",event:"Submission",deal:"Sahel Commodities",user:"B. Ibrahima",detail:"Submitted for IC review, ticket $2.2M"},
+  {ts:"2025-11-14 16:11",event:"Approval",deal:"Akosua Holdings",user:"N. Ikoué",detail:"Approved 3-0, IRR 28%"},
+  {ts:"2025-11-14 15:44",event:"Vote",deal:"Akosua Holdings",user:"J. Botouli",detail:"Vote: Approve"},
+  {ts:"2025-11-14 11:20",event:"Vote",deal:"Akosua Holdings",user:"B. Ibrahima",detail:"Vote: Approve"},
+  {ts:"2025-11-14 09:05",event:"Vote",deal:"Akosua Holdings",user:"N. Ikoué",detail:"Vote: Approve"},
+  {ts:"2025-11-13 17:00",event:"Submission",deal:"Akosua Holdings",user:"N. Ikoué",detail:"Submitted for IC, DD Score 82"},
+  {ts:"2025-11-13 10:15",event:"Info Request",deal:"Lagos RE Portfolio",user:"J. Botouli",detail:"Requested updated valuation report"},
+  {ts:"2025-11-12 14:00",event:"Submission",deal:"Lagos RE Portfolio",user:"N. Ikoué",detail:"Submitted for IC review, ticket $6.0M"},
+  {ts:"2025-11-10 16:30",event:"Approval",deal:"Makoua AgriCo",user:"N. Ikoué",detail:"Approved 3-0, IRR 32%"},
+  {ts:"2025-11-06 12:00",event:"Approval",deal:"Meridian Credit",user:"B. Ibrahima",detail:"Approved 2-1 with covenant conditions"},
+  {ts:"2025-10-25 09:30",event:"Rejection",deal:"Delta Finco",user:"N. Ikoué",detail:"Rejected 3-0 — IRR below hurdle rate"},
+];
+const EC={Submission:"tag-b",Vote:"tag-p",Approval:"tag-g",Rejection:"tag-r","Info Request":"tag-a"};
+function renderLog(list){
+  document.getElementById("log-body").innerHTML=list.map(l=>`<tr>
+    <td style="font-family:var(--ffm);font-size:11px;color:var(--muted)">${l.ts}</td>
+    <td><span class="tag ${EC[l.event]||'tag-b'}">${l.event}</span></td>
+    <td style="font-weight:600">${l.deal}</td>
+    <td>${l.user}</td>
+    <td style="font-size:12px;color:var(--muted)">${l.detail}</td>
+  </tr>`).join("");
+}
+function filterLog(q){
+  const t=document.getElementById("evt-filter").value;
+  renderLog(LOG.filter(l=>(!q||l.deal.toLowerCase().includes(q.toLowerCase())||l.user.toLowerCase().includes(q.toLowerCase()))&&(!t||l.event===t)));
+}
+renderLog(LOG);
+</script></body></html>

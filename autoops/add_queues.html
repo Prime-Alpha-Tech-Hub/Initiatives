@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoOps · Queues · Prime Alpha Securities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0d14;--surf:#111520;--surf2:#161c2d;--surf3:#1d2540;
+  --border:#252d45;--text:#e8eaf0;--muted:#6b7494;
+  --acc:#1fc98a;--blue:#4a7cff;--green:#1fc98a;--red:#f04166;
+  --amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;
+}
+[data-theme=light]{
+  --bg:#f0f2f8;--surf:#ffffff;--surf2:#e8ebf4;--surf3:#dde1ee;
+  --border:#c8cde0;--text:#111520;--muted:#5a6180;
+}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+nav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.nav-back{color:var(--muted);text-decoration:none;font-size:13px;display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--acc)}
+.nav-title{font-weight:600;font-size:15px;color:var(--text)}
+.nav-pill{background:var(--acc);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:4px;letter-spacing:.5px}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.theme-btn{background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit}
+.tab-bar{background:var(--surf);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto}
+.tab{padding:12px 16px;border:none;background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.tab.active,.tab:hover{color:var(--acc);border-bottom-color:var(--acc)}
+main{padding:24px;max-width:1400px;margin:0 auto}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.metric{font-size:28px;font-weight:700;color:var(--text);line-height:1}
+.metric-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:#1fc98a22;color:var(--green)}
+.badge-red{background:#f0416622;color:var(--red)}
+.badge-amber{background:#f59e0b22;color:var(--amber)}
+.badge-blue{background:#4a7cff22;color:var(--blue)}
+.badge-purple{background:#a78bfa22;color:var(--purple)}
+.badge-acc{background-color:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all .2s}
+.btn-acc{background:var(--acc);color:#fff}.btn-acc:hover{opacity:.85}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--acc);color:var(--acc)}
+.btn-ghost{background:var(--surf2);color:var(--text)}.btn-ghost:hover{background:var(--surf3)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{opacity:.85}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.85}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+.input:focus{border-color:var(--acc)}
+.select{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none;cursor:pointer}
+.label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.row{display:flex;align-items:center;gap:12px}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.col{display:flex;flex-direction:column;gap:8px}
+.sep{height:1px;background:var(--border);margin:16px 0}
+.progress-bar{height:6px;background:var(--surf3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:var(--acc);transition:width .4s}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surf3);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.modal-overlay{position:fixed;inset:0;background:#00000088;z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:500px;width:90%;transform:translateY(20px);transition:transform .2s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--surf3);color:var(--muted)}
+footer{text-align:center;padding:32px 24px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:40px}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:16px;position:relative;padding-bottom:20px}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--acc);margin-top:4px;flex-shrink:0;position:relative;z-index:1}
+.tl-line{position:absolute;left:5px;top:16px;bottom:0;width:2px;background:var(--border)}
+.tl-item:last-child .tl-line{display:none}
+.tl-body{flex:1}
+.tl-title{font-weight:600;font-size:13px}
+.tl-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.code{font-family:'DM Mono',monospace;font-size:12px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:12px;white-space:pre-wrap;line-height:1.6}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-back" href="../index.html">← Roadmap</a>
+  <span style="color:var(--border)">|</span>
+  <span class="nav-title">AutoOps · Queues</span>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()">◐ Theme</button>
+  </div>
+</nav>
+<script>
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pas-theme',h.dataset.theme)}
+(function(){const t=localStorage.getItem('pas-theme');if(t)document.documentElement.dataset.theme=t})();
+function toast(msg,type='info'){const t=document.createElement('div');t.className='toast';t.style.borderColor=type==='success'?'var(--green)':type==='error'?'var(--red)':'var(--acc)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400)},3200)}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+</script>
+
+<div class="tab-bar">
+  <button class="tab" onclick="location.href='dashboard.html'">Dashboard</button>
+  <button class="tab" onclick="location.href='kyc.html'">KYC</button>
+  <button class="tab" onclick="location.href='compliance.html'">Compliance</button>
+  <button class="tab active" onclick="location.href='queues.html'">Queues</button>
+  <button class="tab" onclick="location.href='logs.html'">Logs</button>
+</div>
+<main>
+  <div class="row-between" style="margin-bottom:20px">
+    <div><h2 style="font-size:20px;font-weight:700">SQS Queue Monitor</h2><p style="color:var(--muted);font-size:13px;margin-top:2px">AWS SQS · Step Functions · EventBridge routing</p></div>
+    <div class="row"><button class="btn btn-ghost" onclick="purgeAll()">🗑 Purge DLQ</button><button class="btn btn-acc" onclick="refreshQueues()">↻ Refresh</button></div>
+  </div>
+
+  <div class="grid g4" style="margin-bottom:20px">
+    <div class="card"><div class="card-title">Total Messages</div><div class="metric" id="q-total">142</div></div>
+    <div class="card"><div class="card-title">In Flight</div><div class="metric" id="q-inflight">8</div></div>
+    <div class="card"><div class="card-title">DLQ Messages</div><div class="metric" id="q-dlq" style="color:var(--red)">3</div></div>
+    <div class="card"><div class="card-title">Throughput</div><div class="metric" id="q-tps">24/s</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Queue Status</div>
+    <table><thead><tr><th>Queue Name</th><th>Messages</th><th>In Flight</th><th>DLQ</th><th>Visibility Timeout</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><code style="font-family:'DM Mono',monospace;font-size:12px">pas-kyc-intake</code></td><td>47</td><td>3</td><td>0</td><td>30s</td><td><span class="badge badge-green">Healthy</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="drainQueue('kyc-intake')">Drain</button></td></tr>
+      <tr><td><code style="font-family:'DM Mono',monospace;font-size:12px">pas-aml-checks</code></td><td>31</td><td>2</td><td>1</td><td>60s</td><td><span class="badge badge-amber">Warning</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="drainQueue('aml-checks')">Drain</button></td></tr>
+      <tr><td><code style="font-family:'DM Mono',monospace;font-size:12px">pas-doc-extraction</code></td><td>28</td><td>2</td><td>2</td><td>120s</td><td><span class="badge badge-amber">Warning</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="drainQueue('doc-extraction')">Drain</button></td></tr>
+      <tr><td><code style="font-family:'DM Mono',monospace;font-size:12px">pas-reporting</code></td><td>14</td><td>1</td><td>0</td><td>30s</td><td><span class="badge badge-green">Healthy</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="drainQueue('reporting')">Drain</button></td></tr>
+      <tr><td><code style="font-family:'DM Mono',monospace;font-size:12px">pas-dlq-main</code></td><td>3</td><td>0</td><td>3</td><td>—</td><td><span class="badge badge-red">DLQ</span></td><td><button class="btn btn-red" style="padding:4px 10px;font-size:12px" onclick="replayDLQ()">Replay</button></td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-title">Message Throughput (1h)</div>
+      <canvas id="tpChart" height="140"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Step Functions Executions</div>
+      <div class="col" style="gap:0">
+        <div class="stat-row"><span>KYC Onboarding Flow</span><div class="row" style="gap:6px"><span class="badge badge-green">12 running</span><span class="badge badge-blue">4 pending</span></div></div>
+        <div class="stat-row"><span>AML Check Flow</span><div class="row" style="gap:6px"><span class="badge badge-green">7 running</span><span class="badge badge-red">1 failed</span></div></div>
+        <div class="stat-row"><span>Report Generation Flow</span><div class="row" style="gap:6px"><span class="badge badge-green">3 running</span></div></div>
+        <div class="stat-row"><span>Data Ingestion Flow</span><div class="row" style="gap:6px"><span class="badge badge-blue">2 pending</span></div></div>
+        <div style="margin-top:12px"><button class="btn btn-acc" style="width:100%" onclick="viewExecutions()">View All Executions</button></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const labels=[...Array(12)].map((_,i)=>`${55-i*5}m`).reverse();
+new Chart(document.getElementById('tpChart').getContext('2d'),{
+  type:'line',data:{labels,datasets:[{label:'msg/s',data:[18,22,19,24,28,21,25,27,22,24,20,24],borderColor:'#1fc98a',backgroundColor:'#1fc98a22',borderWidth:2,fill:true,tension:.4,pointRadius:0}]},
+  options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6b7494'},grid:{color:'#252d45'}},y:{ticks:{color:'#6b7494'},grid:{color:'#252d45'}}}}
+});
+function refreshQueues(){toast('Refreshing queues…','info');setTimeout(()=>toast('Queue data updated','success'),1100)}
+function purgeAll(){toast('DLQ purged · 3 messages removed','success')}
+function drainQueue(q){toast('Draining queue: '+q,'info')}
+function replayDLQ(){toast('Replaying 3 DLQ messages…','info');setTimeout(()=>toast('DLQ replay complete','success'),1800)}
+function viewExecutions(){toast('Opening Step Functions console…','info')}
+</script>
+<footer>Prime Alpha Securities · AutoOps · Queues · Confidential · {}</footer>
+<script>(()=>{document.querySelector('footer').innerHTML=document.querySelector('footer').innerHTML.replace('{}',new Date().getFullYear())})();</script>
+</body></html>

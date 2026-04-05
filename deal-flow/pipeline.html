@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Deal Flow — Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--border2:#1f2d47;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--ffd:'Fraunces',serif;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--border2:#c5cbe0;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .22s ease both}.fu1{animation-delay:.06s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 18px;height:48px;display:flex;align-items:center;position:sticky;top:0;z-index:100;gap:0}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc,var(--blue));margin-right:6px}
+.nav-sep{color:var(--border2);margin:0 6px;font-size:15px}
+.nav-sub{font-size:11px;color:var(--muted);margin-right:18px}
+.nav-links{display:flex;align-items:center;gap:1px;flex:1;overflow-x:auto}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);transition:all .12s;white-space:nowrap}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc,var(--blue));background:rgba(74,124,255,.08);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:8px;flex-shrink:0}
+.tl-btn{padding:5px 10px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--acc,var(--blue));color:var(--text)}
+.toolbar{padding:9px 18px;border-bottom:1px solid var(--border);background:var(--surf);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-pill{padding:3px 11px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .12s}
+.filter-pill:hover,.filter-pill.active{border-color:var(--acc,var(--blue));color:var(--acc,var(--blue));background:rgba(74,124,255,.08)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn-sec{padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surf2);color:var(--text);transition:all .15s}
+.btn-sec:hover{border-color:var(--acc,var(--blue));color:var(--acc,var(--blue))}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.card-hd{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.main{padding:18px 20px}
+.metrics{display:grid;gap:10px;margin-bottom:16px}
+.m-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px}
+.m-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+.m-val{font-family:var(--ffm);font-size:18px;font-weight:700}
+.m-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{text-align:left;padding:8px 13px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--surf2)}
+.table td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--muted)}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:var(--surf2)}
+.nm{font-weight:700;color:var(--text)}
+.num{font-family:var(--ffm);color:var(--text)}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:22px;width:480px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.mx{font-size:20px;color:var(--muted);cursor:pointer;background:none;border:none;line-height:1}
+.mx:hover{color:var(--text)}
+.frow{margin-bottom:12px}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.fi,.fs,.ft{width:100%;padding:8px 10px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--acc,var(--blue))}
+.ft{resize:vertical;min-height:70px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toast{position:fixed;bottom:18px;right:18px;padding:10px 16px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;opacity:0;transform:translateY(40px);transition:all .28s;pointer-events:none;color:#fff}
+.toast.show{opacity:1;transform:translateY(0)}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(201,168,76,.1);font-size:11px;color:var(--muted);margin-top:16px}
+.pg-footer span{color:var(--gold);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-right:4px}
+.section-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:18px 0 10px}
+.empty{padding:40px;text-align:center;color:var(--muted);font-size:13px}
+
+:root{--acc:#1fc98a}
+.nav-item.active{color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent);}
+.filter-pill.active{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,transparent);}
+</style>
+</head>
+<body><nav class="topnav">
+<span class="nav-logo">PAS</span><span class="nav-sep">|</span>
+<span class="nav-sub">Deal Flow Intelligence</span>
+<div class="nav-links"><a class="nav-item active" href="pipeline.html" onclick="setNav(this)">🔵 Pipeline</a><a class="nav-item" href="scoring.html" onclick="setNav(this)">⭐ Scoring</a><a class="nav-item" href="inbox.html" onclick="setNav(this)">📥 Inbox</a><a class="nav-item" href="analytics.html" onclick="setNav(this)">📊 Analytics</a><a class="nav-item" href="criteria.html" onclick="setNav(this)">⚙ Criteria</a></div>
+<div class="nav-right">
+<a class="tl-btn" href="../index.html">← Roadmap</a>
+<button class="tl-btn tbtn" onclick="toggleTheme()">☀ Light</button>
+</div>
+</nav>
+<div class="toolbar">
+  <div class="filter-pill active" onclick="setP(this,'all')">All Strategies</div>
+  <div class="filter-pill" onclick="setP(this,'pe')">Private Equity</div>
+  <div class="filter-pill" onclick="setP(this,'credit')">Private Credit</div>
+  <div class="filter-pill" onclick="setP(this,'comm')">Commodities</div>
+  <div class="filter-pill" onclick="setP(this,'re')">Real Estate</div>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <input class="fi" style="width:160px" placeholder="Search deals…" oninput="search(this.value)"/>
+    <button class="btn" style="background:var(--acc);color:#000" onclick="openM('addM')">+ Ingest Deal</button>
+  </div>
+</div>
+<div class="main">
+<div class="metrics" style="grid-template-columns:repeat(5,1fr)">
+  <div class="m-box"><div class="m-lbl">Pipeline Total</div><div class="m-val">31</div></div>
+  <div class="m-box"><div class="m-lbl">Sourced Today</div><div class="m-val" style="color:var(--acc)">4</div></div>
+  <div class="m-box"><div class="m-lbl">Avg Score</div><div class="m-val" style="color:var(--green)">71</div></div>
+  <div class="m-box"><div class="m-lbl">Routed to Analyst</div><div class="m-val" style="color:var(--amber)">8</div></div>
+  <div class="m-box"><div class="m-lbl">Rejected (Auto)</div><div class="m-val" style="color:var(--red)">12</div></div>
+</div>
+<div class="card">
+<div class="card-hd"><span class="card-title">Deal Pipeline — Kanban</span><span class="live-dot"></span></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow-x:auto" id="board"></div>
+</div>
+</div>
+<div class="modal-ov" id="addM" onclick="if(event.target===this)closeM('addM')">
+<div class="modal">
+<div class="modal-title">Ingest New Deal <button class="mx" onclick="closeM('addM')">✕</button></div>
+<div class="frow"><label class="fl">Upload Document</label>
+<div style="border:2px dashed var(--border);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;color:var(--muted);transition:border-color .2s" onclick="fakeUpload(this)" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'" id="dropzone">
+📄 Click to upload PDF, DOCX, or XLSX<br/><span style="font-size:10px">Auto-classified by Claude Sonnet</span>
+</div></div>
+<div class="frow"><label class="fl">Or enter manually</label><input class="fi" id="dealName" placeholder="Company name"/></div>
+<div class="fr2">
+<div class="frow"><label class="fl">Source Language</label><select class="fs"><option>English</option><option>French (auto-translate)</option><option>Arabic</option><option>Amharic</option></select></div>
+<div class="frow"><label class="fl">Source Channel</label><select class="fs"><option>Email / S3</option><option>Manual Entry</option><option>Referral</option><option>Conference</option></select></div>
+</div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+<button class="btn-sec" onclick="closeM('addM')">Cancel</button>
+<button class="btn" style="background:var(--acc);color:#000" onclick="ingest()">Ingest & Classify</button>
+</div>
+</div></div>
+<script>
+const LANES=['Sourced','Screened','Scored','Routed'];
+const COLS={pe:'#4a7cff',credit:'#1fc98a',comm:'#f59e0b',re:'#a78bfa'};
+let deals=[
+ {id:1,name:'Cameroon Agri Holdings',strat:'pe',geo:'Cameroon',score:82,lane:2,analyst:'JB',days:3},
+ {id:2,name:'Dakar Fintech Ventures',strat:'pe',geo:'Senegal',score:67,lane:1,analyst:'NI',days:1},
+ {id:3,name:'Maize Futures AFEX',strat:'comm',geo:'Nigeria',score:74,lane:3,analyst:'BI',days:0},
+ {id:4,name:'Lagos Micro-Credit SPV',strat:'credit',geo:'Nigeria',score:58,lane:1,analyst:'NI',days:2},
+ {id:5,name:'Abidjan Office REIT',strat:'re',geo:'Côte d'Ivoire',score:70,lane:2,analyst:'JB',days:5},
+ {id:6,name:'Douala Port Logistics',strat:'pe',geo:'Cameroon',score:88,lane:3,analyst:'JB',days:1},
+];
+let filt='all',q='';
+function setP(el,f){filt=f;document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');render();}
+function search(v){q=v.toLowerCase();render();}
+function render(){
+  const b=document.getElementById('board');b.innerHTML='';
+  LANES.forEach((lane,li)=>{
+    const cards=deals.filter(d=>(filt==='all'||d.strat===filt)&&(!q||d.name.toLowerCase().includes(q))&&d.lane===li);
+    const col=document.createElement('div');
+    col.style.cssText='border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:300px';
+    col.innerHTML=`<div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+    <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)">${lane}</span>
+    <span style="font-size:10px;font-family:var(--ffm);color:var(--muted)">${cards.length}</span>
+    </div>
+    <div style="padding:8px;flex:1;display:flex;flex-direction:column;gap:6px">
+    ${cards.map(d=>`<div style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;border-top:3px solid ${COLS[d.strat]}" onclick="advanceDeal(${d.id})">
+      <div style="font-size:12px;font-weight:700;margin-bottom:3px">${d.name}</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px">${d.geo}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;color:var(--muted)">${d.analyst}</span>
+        <span style="font-family:var(--ffm);font-size:12px;font-weight:700;color:${d.score>=75?'#1fc98a':d.score>=60?'#f59e0b':'#f04166'}">${d.score}</span>
+      </div>
+    </div>`).join('')}
+    </div>`;
+    b.appendChild(col);
+  });
+}
+function advanceDeal(id){const d=deals.find(x=>x.id===id);if(d.lane<3){d.lane++;render();toast(`${d.name} advanced to ${LANES[d.lane]}`);}else toast(`${d.name} is fully routed`,'#f59e0b');}
+let nid=deals.length+1;
+function ingest(){
+  const n=document.getElementById('dealName').value.trim()||'Auto-classified Deal';
+  deals.unshift({id:nid++,name:n,strat:'pe',geo:'CEMAC',score:Math.floor(Math.random()*40+50),lane:0,analyst:'TBD',days:0});
+  closeM('addM');render();toast(`"${n}" ingested — classifying…`,'var(--acc)');
+  setTimeout(()=>toast(`"${n}" classified: Private Equity · Score 67`),1800);
+}
+function fakeUpload(el){el.innerHTML='⏳ Uploading…<br/><span style="font-size:10px">Textract OCR running</span>';setTimeout(()=>{el.innerHTML='✅ Classified: Private Equity · Score 74<br/><span style="font-size:10px">Ready to ingest</span>';},1400);}
+render();
+</script><div class="toast" id="_t"></div>
+<footer class="pg-footer"><span>Prime Alpha Securities</span> &nbsp;·&nbsp; Deal Flow Intelligence · Pipeline &nbsp;·&nbsp; Confidential</footer>
+<script>
+function toggleTheme(){
+  const d=document.documentElement,cur=d.getAttribute('data-theme')||'dark',next=cur==='dark'?'light':'dark';
+  d.setAttribute('data-theme',next);localStorage.setItem('pas_theme',next);
+  document.querySelectorAll('.tbtn').forEach(b=>b.textContent=next==='dark'?'☀ Light':'◑ Dark');
+  if(typeof onThemeChange==='function')onThemeChange(next);
+}
+(function(){
+  const t=localStorage.getItem('pas_theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  window.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.tbtn').forEach(b=>b.textContent=t==='dark'?'☀ Light':'◑ Dark'));
+})();
+function toast(msg,col){const t=document.getElementById('_t');t.textContent=msg;t.style.background=col||'#1fc98a';t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2600);}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function setNav(el){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
+</script>
+</body></html>

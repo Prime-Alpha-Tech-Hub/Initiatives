@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Investor CRM — Communications</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--border2:#1f2d47;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',sans-serif;--ffm:'DM Mono',monospace;--ffd:'Fraunces',serif;--r:6px;--rl:10px}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#fff;--surf2:#f4f6fb;--surf3:#edf0f7;--border:#dde1ed;--border2:#c5cbe0;--blue:#2563eb;--blue-d:rgba(37,99,235,.08);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0}
+html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .22s ease both}.fu1{animation-delay:.06s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 18px;height:48px;display:flex;align-items:center;position:sticky;top:0;z-index:100;gap:0}
+.nav-logo{font-family:var(--ffm);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--acc,var(--blue));margin-right:6px}
+.nav-sep{color:var(--border2);margin:0 6px;font-size:15px}
+.nav-sub{font-size:11px;color:var(--muted);margin-right:18px}
+.nav-links{display:flex;align-items:center;gap:1px;flex:1;overflow-x:auto}
+.nav-item{padding:6px 11px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);transition:all .12s;white-space:nowrap}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--acc,var(--blue));background:rgba(74,124,255,.08);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:8px;flex-shrink:0}
+.tl-btn{padding:5px 10px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .12s}
+.tl-btn:hover{border-color:var(--acc,var(--blue));color:var(--text)}
+.toolbar{padding:9px 18px;border-bottom:1px solid var(--border);background:var(--surf);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-pill{padding:3px 11px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .12s}
+.filter-pill:hover,.filter-pill.active{border-color:var(--acc,var(--blue));color:var(--acc,var(--blue));background:rgba(74,124,255,.08)}
+.btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn-sec{padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surf2);color:var(--text);transition:all .15s}
+.btn-sec:hover{border-color:var(--acc,var(--blue));color:var(--acc,var(--blue))}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl)}
+.card-hd{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.main{padding:18px 20px}
+.metrics{display:grid;gap:10px;margin-bottom:16px}
+.m-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px}
+.m-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+.m-val{font-family:var(--ffm);font-size:18px;font-weight:700}
+.m-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{text-align:left;padding:8px 13px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--surf2)}
+.table td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--muted)}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:var(--surf2)}
+.nm{font-weight:700;color:var(--text)}
+.num{font-family:var(--ffm);color:var(--text)}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:22px;width:480px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.mx{font-size:20px;color:var(--muted);cursor:pointer;background:none;border:none;line-height:1}
+.mx:hover{color:var(--text)}
+.frow{margin-bottom:12px}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.fi,.fs,.ft{width:100%;padding:8px 10px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:var(--ff);outline:none;transition:border-color .15s}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--acc,var(--blue))}
+.ft{resize:vertical;min-height:70px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toast{position:fixed;bottom:18px;right:18px;padding:10px 16px;border-radius:var(--rl);font-size:13px;font-weight:600;z-index:9999;opacity:0;transform:translateY(40px);transition:all .28s;pointer-events:none;color:#fff}
+.toast.show{opacity:1;transform:translateY(0)}
+.pg-footer{text-align:center;padding:14px;border-top:1px solid rgba(201,168,76,.1);font-size:11px;color:var(--muted);margin-top:16px}
+.pg-footer span{color:var(--gold);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-right:4px}
+.section-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:18px 0 10px}
+.empty{padding:40px;text-align:center;color:var(--muted);font-size:13px}
+
+:root{--acc:#a78bfa}
+.nav-item.active{color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent);}
+.filter-pill.active{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,transparent);}
+</style>
+</head>
+<body><nav class="topnav">
+<span class="nav-logo">PAS</span><span class="nav-sep">|</span>
+<span class="nav-sub">Investor CRM</span>
+<div class="nav-links"><a class="nav-item" href="investors.html" onclick="setNav(this)">👥 Investors</a><a class="nav-item" href="capital-calls.html" onclick="setNav(this)">💰 Capital Calls</a><a class="nav-item" href="distributions.html" onclick="setNav(this)">💸 Distributions</a><a class="nav-item" href="portal.html" onclick="setNav(this)">🌐 LP Portal</a><a class="nav-item active" href="comms.html" onclick="setNav(this)">✉ Comms</a></div>
+<div class="nav-right">
+<a class="tl-btn" href="../index.html">← Roadmap</a>
+<button class="tl-btn tbtn" onclick="toggleTheme()">☀ Light</button>
+</div>
+</nav>
+<div class="toolbar">
+  <div class="filter-pill active" onclick="setF(this,'all')">All</div>
+  <div class="filter-pill" onclick="setF(this,'sent')">Sent</div>
+  <div class="filter-pill" onclick="setF(this,'draft')">Drafts</div>
+  <div style="margin-left:auto">
+    <button class="btn" style="background:var(--acc);color:#fff" onclick="openM('composeM')">+ Compose</button>
+  </div>
+</div>
+<div class="main">
+<div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+  <div class="m-box"><div class="m-lbl">Emails Sent (30d)</div><div class="m-val">42</div></div>
+  <div class="m-box"><div class="m-lbl">Open Rate</div><div class="m-val" style="color:var(--green)">78%</div></div>
+  <div class="m-box"><div class="m-lbl">Drafts</div><div class="m-val" style="color:var(--amber)">3</div></div>
+  <div class="m-box"><div class="m-lbl">Unsubscribes</div><div class="m-val" style="color:var(--red)">0</div></div>
+</div>
+<div class="card">
+<div class="card-hd"><span class="card-title">Communication Log</span></div>
+<table class="table"><thead><tr><th>Subject</th><th>Recipients</th><th>Date</th><th>Opens</th><th>Status</th><th></th></tr></thead>
+<tbody id="commBody"></tbody>
+</table>
+</div>
+</div>
+<div class="modal-ov" id="composeM" onclick="if(event.target===this)closeM('composeM')">
+<div class="modal">
+<div class="modal-title">Compose LP Communication <button class="mx" onclick="closeM('composeM')">✕</button></div>
+<div class="frow"><label class="fl">To</label><select class="fs"><option>All LPs</option><option>Institutional Only</option><option>Family Offices</option><option>Select LP…</option></select></div>
+<div class="frow"><label class="fl">Template</label><select class="fs" onchange="loadTemplate(this.value)"><option value="">— blank —</option><option value="quarterly">Quarterly Update</option><option value="call">Capital Call Notice</option><option value="distribution">Distribution Notice</option></select></div>
+<div class="frow"><label class="fl">Subject</label><input class="fi" id="subj" placeholder="Subject line"/></div>
+<div class="frow"><label class="fl">Body</label><textarea class="ft" id="body" style="min-height:120px"></textarea></div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+<button class="btn-sec" onclick="saveDraft()">Save Draft</button>
+<button class="btn" style="background:var(--acc);color:#fff" onclick="sendComm()">Send via SES</button>
+</div>
+</div></div>
+<script>
+const comms=[
+ {sub:'Q1 2026 Quarterly Investor Update',recs:'All LPs (6)',date:'2026-04-01',opens:'5/6',status:'sent'},
+ {sub:'Capital Call #4 — Notice of Drawdown',recs:'All LPs (6)',date:'2026-03-28',opens:'6/6',status:'sent'},
+ {sub:'Acme Manufacturing — IC Approval Update',recs:'Institutional (3)',date:'2026-03-20',opens:'3/3',status:'sent'},
+ {sub:'Annual Performance Letter FY2025',recs:'All LPs (6)',date:'2026-03-15',opens:'4/6',status:'sent'},
+ {sub:'Draft: Q2 Update',recs:'—',date:'2026-04-03',opens:'—',status:'draft'},
+];
+let filt='all';
+function setF(el,f){filt=f;document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');render();}
+function render(){
+  const list=comms.filter(c=>filt==='all'||c.status===filt);
+  document.getElementById('commBody').innerHTML=list.map(c=>`<tr>
+<td class="nm">${c.sub}</td>
+<td style="color:var(--muted);font-size:11px">${c.recs}</td>
+<td class="num" style="font-size:11px">${c.date}</td>
+<td class="num" style="font-size:11px">${c.opens}</td>
+<td><span class="tag" style="background:${c.status==='sent'?'rgba(31,201,138,.1)':'rgba(245,158,11,.1)'};color:${c.status==='sent'?'#1fc98a':'#f59e0b'}">${c.status}</span></td>
+<td><button class="btn-sec" style="font-size:11px;padding:3px 8px" onclick="toast('${c.status==='sent'?'Opening email…':'Opening draft…'}','#a78bfa')">${c.status==='sent'?'View':'Edit'}</button></td>
+</tr>`).join('');
+}
+const TEMPLATES={quarterly:{s:'Q1 2026 Quarterly Investor Update — Prime Alpha Securities',b:'Dear Investor,
+
+We are pleased to share our Q1 2026 performance update…'},call:{s:'Capital Call Notice — Prime Alpha Securities Fund I',b:'Dear LP,
+
+Pursuant to Section 4.2 of the Limited Partnership Agreement…'},distribution:{s:'Distribution Notice — Prime Alpha Securities',b:'Dear LP,
+
+Please find below details of the distribution to be made…'}};
+function loadTemplate(t){if(!t)return;const tp=TEMPLATES[t];document.getElementById('subj').value=tp.s;document.getElementById('body').value=tp.b;}
+function saveDraft(){closeM('composeM');comms.push({sub:document.getElementById('subj').value||'Untitled Draft',recs:'—',date:new Date().toISOString().slice(0,10),opens:'—',status:'draft'});render();toast('Draft saved');}
+function sendComm(){closeM('composeM');comms.unshift({sub:document.getElementById('subj').value||'Communication',recs:'All LPs',date:new Date().toISOString().slice(0,10),opens:'0/6',status:'sent'});render();toast('Email sent via SES to all recipients');}
+render();
+</script><div class="toast" id="_t"></div>
+<footer class="pg-footer"><span>Prime Alpha Securities</span> &nbsp;·&nbsp; Investor CRM · Communications &nbsp;·&nbsp; Confidential</footer>
+<script>
+function toggleTheme(){
+  const d=document.documentElement,cur=d.getAttribute('data-theme')||'dark',next=cur==='dark'?'light':'dark';
+  d.setAttribute('data-theme',next);localStorage.setItem('pas_theme',next);
+  document.querySelectorAll('.tbtn').forEach(b=>b.textContent=next==='dark'?'☀ Light':'◑ Dark');
+  if(typeof onThemeChange==='function')onThemeChange(next);
+}
+(function(){
+  const t=localStorage.getItem('pas_theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  window.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.tbtn').forEach(b=>b.textContent=t==='dark'?'☀ Light':'◑ Dark'));
+})();
+function toast(msg,col){const t=document.getElementById('_t');t.textContent=msg;t.style.background=col||'#1fc98a';t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2600);}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function setNav(el){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
+</script>
+</body></html>
