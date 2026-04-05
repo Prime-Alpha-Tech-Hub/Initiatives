@@ -20,7 +20,7 @@ def serve_spa(request, *args, **kwargs):
     )
 
 
-urlpatterns = [
+_base = [
     path('admin/', admin.site.urls),
 
     # API status
@@ -43,8 +43,12 @@ urlpatterns = [
     path('api/portfolio/',  include('apps.portfolio.urls')),
     path('api/documents/',  include('apps.documents.urls')),
     path('api/core/',       include('apps.core.urls')),
+    path('api/reporting/',  include('apps.reporting.urls')),
+    path('api/knowledge/',   include('apps.knowledge.urls')),
 
     # React SPA — catch-all, must be last
     re_path(r'^(?!api/|admin/|static/|media/).*$', serve_spa),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+urlpatterns = [path("alphacore/", include(_base))] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

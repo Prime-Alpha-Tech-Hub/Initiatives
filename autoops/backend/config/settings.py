@@ -236,3 +236,13 @@ LOGGING = {
         'celery.task':     {'handlers': ['celery_file', 'error_file'],            'level': 'INFO',  'propagate': False},
     },
 }
+
+# ── URL prefix (namespaced deployment) ───────────────────────────────────────
+FORCE_SCRIPT_NAME = config('SCRIPT_NAME', default='/ao')
+
+# ── Integration peers (blank = standalone) ──────────────────────────────────
+INTEGRATION_API_KEY = config('INTEGRATION_API_KEY', default='')
+ALPHACORE_URL       = config('ALPHACORE_URL', default='')
+ALPHACORE_API_KEY   = config('ALPHACORE_API_KEY', default='')
+DD_ENGINE_URL       = config('DD_ENGINE_URL', default='')
+DD_ENGINE_API_KEY   = config('DD_ENGINE_API_KEY', default='')

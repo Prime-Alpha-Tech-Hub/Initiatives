@@ -23,10 +23,18 @@ class DDDocumentSerializer(serializers.ModelSerializer):
 
 class DDDocumentListSerializer(serializers.ModelSerializer):
     file_size_display = serializers.ReadOnlyField()
+    file_url = serializers.SerializerMethodField()
+
+    def get_file_url(self, obj):
+        req = self.context.get('request')
+        if obj.file and req:
+            return req.build_absolute_uri(obj.file.url)
+        return None
+
     class Meta:
         model  = DDDocument
         fields = ['id', 'title', 'doc_type', 'status', 'deal_id', 'deal_name',
-                  'company_name', 'file_size_display', 'page_count',
+                  'company_name', 'file_size_display', 'page_count', 'file_url',
                   'created_at', 'processed_at']
 
 
@@ -74,6 +82,31 @@ class DDDocumentViewSet(viewsets.ModelViewSet):
         self._extract(doc)
         return Response(DDDocumentSerializer(doc).data)
 
+
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        """Move document to the analyst archive list."""
+        from .models import DDDocumentArchive
+        doc = self.get_object()
+        max_order = DDDocumentArchive.objects.count()
+        entry, created = DDDocumentArchive.objects.get_or_create(
+            document=doc,
+            defaults={
+                'sort_order': max_order,
+                'group_label': doc.deal_name or doc.company_name or '',
+                'archived_by': request.user,
+            }
+        )
+        return Response({'status': 'archived', 'archive_id': entry.id, 'created': created})
+
+    @action(detail=True, methods=['post'])
+    def unarchive(self, request, pk=None):
+        """Remove document from archive list."""
+        from .models import DDDocumentArchive
+        doc = self.get_object()
+        DDDocumentArchive.objects.filter(document=doc).delete()
+        return Response({'status': 'unarchived'})
+
     @action(detail=True, methods=['get'])
     def text_preview(self, request, pk=None):
         """Return first 2000 chars of extracted text."""
@@ -87,3 +120,49 @@ class DDDocumentViewSet(viewsets.ModelViewSet):
 
 
 # ── URLs ──────────────────────────────────────────────────────────────────────
+
+
+# ── Archive viewset ────────────────────────────────────────────────────────────
+from .models import DDDocumentArchive
+
+
+class DDDocumentArchiveSerializer(serializers.ModelSerializer):
+    document_title   = serializers.CharField(source='document.title', read_only=True)
+    document_type    = serializers.CharField(source='document.doc_type', read_only=True)
+    document_status  = serializers.CharField(source='document.status', read_only=True)
+    company_name     = serializers.CharField(source='document.company_name', read_only=True)
+    deal_name        = serializers.CharField(source='document.deal_name', read_only=True)
+    file_url         = serializers.SerializerMethodField()
+    created_at       = serializers.DateTimeField(source='document.created_at', read_only=True)
+
+    class Meta:
+        model  = DDDocumentArchive
+        fields = '__all__'
+
+    def get_file_url(self, obj):
+        req = self.context.get('request')
+        if obj.document.file and req:
+            return req.build_absolute_uri(obj.document.file.url)
+        return None
+
+
+class DDDocumentArchiveViewSet(viewsets.ModelViewSet):
+    queryset           = DDDocumentArchive.objects.select_related('document').all()
+    serializer_class   = DDDocumentArchiveSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=['post'])
+    def reorder(self, request):
+        """Accepts [{id: archive_id, sort_order: N}, ...] and bulk-updates order."""
+        items = request.data.get('items', [])
+        for item in items:
+            DDDocumentArchive.objects.filter(pk=item['id']).update(sort_order=item['sort_order'])
+        return Response({'status': 'reordered'})
+
+    @action(detail=True, methods=['post'])
+    def update_note(self, request, pk=None):
+        entry = self.get_object()
+        entry.analyst_note = request.data.get('note', '')
+        entry.group_label  = request.data.get('group_label', entry.group_label)
+        entry.save()
+        return Response(DDDocumentArchiveSerializer(entry, context={'request': request}).data)

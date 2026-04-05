@@ -204,3 +204,177 @@ class UserProfile(models.Model):
         return Membership.objects.filter(
             user=self.user, company=self.active_company, status='active'
         ).select_related('role').first()
+
+
+# ── PAS Company / Join Request — token-based email actions ───────────────────
+import secrets
+
+class PASRequest(models.Model):
+    """
+    Tracks every company onboarding or join request that PAS must action.
+    PAS receives an email with Accept/Reject links containing a signed token.
+    No Django admin, no shell access needed.
+
+    request_type:
+        'new_company'  — user asked for a company not in the DB
+        'join_company' — user asked to join an existing company
+    """
+    TYPE_CHOICES   = [('new_company', 'New Company'), ('join_company', 'Join Company')]
+    STATUS_CHOICES = [('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected'), ('expired', 'Expired')]
+
+    # Who requested
+    user            = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pas_requests')
+    request_type    = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    status          = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
+
+    # For new_company requests
+    company_name_requested = models.CharField(max_length=255, blank=True)
+
+    # For join_company requests — set if company already exists
+    company         = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True,
+                                        related_name='pas_requests')
+
+    # Secure tokens for email links
+    accept_token    = models.CharField(max_length=64, unique=True, db_index=True)
+    reject_token    = models.CharField(max_length=64, unique=True, db_index=True)
+
+    # PAS note on action (optional, included in notification to user)
+    pas_note        = models.TextField(blank=True)
+
+    # Timestamps
+    created_at      = models.DateTimeField(auto_now_add=True)
+    actioned_at     = models.DateTimeField(null=True, blank=True)
+
+    # Token expiry — 7 days
+    expires_at      = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.email} — {self.request_type} [{self.status}]"
+
+    def save(self, *args, **kwargs):
+        if not self.accept_token:
+            self.accept_token = secrets.token_urlsafe(48)
+        if not self.reject_token:
+            self.reject_token = secrets.token_urlsafe(48)
+        if not self.expires_at:
+            from django.utils import timezone
+            import datetime
+            self.expires_at = timezone.now() + datetime.timedelta(days=7)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+        return self.expires_at and timezone.now() > self.expires_at
+
+
+# ── Integration API Key ───────────────────────────────────────────────────────
+import hashlib, secrets as _secrets
+
+class IntegrationAPIKey(models.Model):
+    """
+    Company-scoped API key for connecting external initiatives
+    (DD Engine, AutoOps, etc.) to AlphaCore.
+
+    The raw key is shown ONCE at creation — only a SHA-256 hash is stored.
+    The prefix (first 8 chars) is stored plain for identification.
+    """
+    SCOPE_CHOICES = [
+        ('dd_engine',   'DD Engine (Initiative 06)'),
+        ('autoops',     'AutoOps (Initiative 13)'),
+        ('reporting',   'Reporting (Initiative 08)'),
+        ('ic_workflow', 'IC Workflow (Initiative 07)'),
+        ('knowledge',   'Knowledge Base (Initiative 10)'),
+        ('all',         'All initiatives'),
+    ]
+
+    company        = models.ForeignKey(Company, on_delete=models.CASCADE,
+                                       related_name='api_keys')
+    name           = models.CharField(max_length=100)          # human label, e.g. "DD Engine prod"
+    prefix         = models.CharField(max_length=8, db_index=True)   # first 8 chars, shown in UI
+    key_hash       = models.CharField(max_length=64)           # SHA-256 hex of full key
+    scope          = models.CharField(max_length=20, choices=SCOPE_CHOICES, default='all')
+    is_active      = models.BooleanField(default=True)
+    created_by     = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at     = models.DateTimeField(auto_now_add=True)
+    last_used_at   = models.DateTimeField(null=True, blank=True)
+    last_used_from = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.company.name} — {self.name} ({self.prefix}…)"
+
+    @classmethod
+    def generate(cls, company, name, scope, created_by):
+        """
+        Create a new key. Returns (instance, raw_key).
+        raw_key is the full secret — caller must show it once and discard.
+        """
+        raw    = 'pac_' + _secrets.token_urlsafe(32)   # pac_ = PAS AlphaCore
+        prefix = raw[:8]
+        hashed = hashlib.sha256(raw.encode()).hexdigest()
+        instance = cls.objects.create(
+            company=company, name=name, scope=scope,
+            prefix=prefix, key_hash=hashed, created_by=created_by,
+        )
+        return instance, raw
+
+    @classmethod
+    def verify(cls, raw_key):
+        """Verify a raw key — returns instance or None."""
+        if not raw_key or not raw_key.startswith('pac_'):
+            return None
+        prefix = raw_key[:8]
+        hashed = hashlib.sha256(raw_key.encode()).hexdigest()
+        try:
+            key = cls.objects.get(prefix=prefix, key_hash=hashed, is_active=True)
+            from django.utils import timezone
+            key.last_used_at = timezone.now()
+            key.save(update_fields=['last_used_at'])
+            return key
+        except cls.DoesNotExist:
+            return None
+
+
+# ── Integration Connection ────────────────────────────────────────────────────
+class IntegrationConnection(models.Model):
+    """
+    Stores connection config for each external initiative
+    (URL + API key ref). One record per company per initiative.
+    """
+    INITIATIVE_CHOICES = [
+        ('dd_engine',   'DD Engine'),
+        ('autoops',     'AutoOps'),
+        ('reporting',   'Reporting'),
+        ('knowledge',   'Knowledge Base'),
+        ('risk',        'Risk Analytics'),
+        ('docs',        'Document Infrastructure'),
+        ('ic_workflow', 'IC Workflow'),
+        ('deal_flow',   'Deal Flow Intelligence'),
+        ('investor_crm','Investor CRM'),
+        ('data_warehouse','Data Warehouse'),
+        ('custom',      'Custom'),
+    ]
+    company     = models.ForeignKey(Company, on_delete=models.CASCADE,
+                                    related_name='integrations')
+    initiative  = models.CharField(max_length=30, choices=INITIATIVE_CHOICES)
+    label       = models.CharField(max_length=100, blank=True)   # custom label
+    base_url    = models.URLField(blank=True)                    # e.g. http://localhost:8081
+    api_key_raw = models.CharField(max_length=200, blank=True)   # stored encrypted (future); raw for now
+    is_active   = models.BooleanField(default=False)
+    last_ping   = models.DateTimeField(null=True, blank=True)
+    ping_ok     = models.BooleanField(default=False)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    updated_at  = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['company', 'initiative']
+        ordering = ['initiative']
+
+    def __str__(self):
+        return f"{self.company.name} → {self.initiative}"

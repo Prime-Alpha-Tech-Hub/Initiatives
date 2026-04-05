@@ -28,7 +28,7 @@ def serve_spa(request, *args, **kwargs):
     return HttpResponse('<h1>Run: ./start.sh to build frontend</h1>', status=503)
 
 
-urlpatterns = [
+_base = [
     path('admin/',          admin.site.urls),
     path('auth/login/',   TokenObtainPairView.as_view(), name='token_obtain'),
     path('auth/refresh/',  TokenRefreshView.as_view(),    name='token_refresh'),
@@ -37,4 +37,6 @@ urlpatterns = [
     path('api/analysis/',   include('apps.analysis.urls')),
     path('api/reports/',    include('apps.reports.urls')),
     re_path(r'^(?!api/|admin/|static/|media/).*$', serve_spa),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+urlpatterns = [path("dd/", include(_base))] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

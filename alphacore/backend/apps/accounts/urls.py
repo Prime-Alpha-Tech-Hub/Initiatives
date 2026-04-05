@@ -5,6 +5,9 @@ from .views import (
     RegisterView, MeView,
     onboard_create_company, onboard_request_join,
     CompanyViewSet, RoleViewSet, MembershipViewSet, JoinRequestViewSet,
+    pas_action_accept, pas_action_reject, relinquish_admin,
+    list_api_keys, create_api_key, revoke_api_key,
+    list_integrations, save_integration, ping_integration,
 )
 
 router = DefaultRouter()
@@ -25,4 +28,23 @@ urlpatterns = [
     path('onboarding/request-join/',   onboard_request_join,   name='onboard-join'),
 
     path('', include(router.urls)),
+
+    # PAS token-based email action endpoints — AllowAny, token is the auth
+    path('pas-action/accept/<str:token>/', pas_action_accept, name='pas-accept'),
+    path('pas-action/reject/<str:token>/', pas_action_reject, name='pas-reject'),
+
+    # Administrator step-down
+    path('relinquish-admin/', relinquish_admin, name='relinquish-admin'),
+
+    # Integration API keys
+    path('api-keys/',              list_api_keys,   name='api-keys-list'),
+    path('api-keys/create/',       create_api_key,  name='api-keys-create'),
+    path('api-keys/<int:pk>/revoke/', revoke_api_key, name='api-keys-revoke'),
+
+    # Integration connections
+    path('integrations/',          list_integrations, name='integrations-list'),
+    path('integrations/save/',     save_integration,  name='integrations-save'),
+    path('integrations/<int:pk>/ping/', ping_integration, name='integrations-ping'),
+
 ]
+

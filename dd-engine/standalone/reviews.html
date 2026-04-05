@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://api.anthropic.com; object-src 'none'">
+<title>DD Engine — DD Reviews</title>
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c14;--surf:#0e1420;--surf2:#141b28;--border:#1c2438;--border2:#1e2d45;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#22d3a0;--red:#f43f5e;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#5a6787;--dim:#2a3450;--ff:'Segoe UI',system-ui,sans-serif;--ffm:'Consolas',monospace;--r:6px;--rl:10px;}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit;color:var(--text);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;outline:none;width:100%;font-size:13px}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,124,255,.08)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .2s ease both}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.btn-p{background:var(--blue);color:#fff;padding:7px 16px;border-radius:var(--r);font-weight:600;font-size:12px;white-space:nowrap;border:none;cursor:pointer}.btn-p:hover{opacity:.85}
+.btn-g{background:var(--surf2);color:var(--muted);border:1px solid var(--border);padding:6px 13px;border-radius:var(--r);font-size:12px;cursor:pointer}.btn-g:hover{border-color:var(--border2);color:var(--text)}
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--surf);border-left:3px solid var(--green);padding:9px 14px;border-radius:var(--r);font-size:13px;animation:fadeUp .2s ease both;border:1px solid rgba(34,211,160,.3);max-width:280px}
+.pg-footer{padding:16px 24px;border-top:1px solid rgba(201,168,76,.12);text-align:center;font-size:11px;color:var(--muted);flex-shrink:0}
+.pg-footer span{color:var(--gold);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;gap:0;flex-shrink:0;position:relative;z-index:100;}
+.nav-brand{display:flex;align-items:center;gap:8px;margin-right:24px;flex-shrink:0}
+.nav-logo{font-family:var(--ffm);font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.12em;text-transform:uppercase}
+.nav-sep{color:var(--border2);font-size:14px}
+.nav-sub{font-size:11px;color:var(--muted)}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-item{padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .12s;display:flex;align-items:center;gap:5px;}
+.nav-item:hover{color:var(--text);background:var(--surf2)}
+.nav-item.active{color:var(--blue);background:var(--blue-d);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.connect-btn{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .12s;}
+.connect-btn:hover{border-color:var(--blue);color:var(--text)}
+.connect-btn.connected{border-color:var(--green);color:var(--green)}
+.connect-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0}
+.connect-dot.on{background:var(--green)}
+.connect-panel{position:absolute;top:49px;right:16px;width:400px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:200;}
+.cp-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.cp-sub{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.cp-row{margin-bottom:10px}
+.cp-lbl{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.cp-input{font-family:var(--ffm);font-size:12px;width:100%}
+.cp-save{background:var(--blue);color:#fff;padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:none}
+.cp-cancel{background:var(--surf2);color:var(--muted);border:1px solid var(--border);padding:6px 14px;border-radius:var(--r);font-size:12px;cursor:pointer}
+.cp-clear{background:rgba(244,63,94,.1);color:var(--red);border:1px solid rgba(244,63,94,.25);padding:6px 14px;border-radius:var(--r);font-size:12px;cursor:pointer;margin-left:auto}
+.tl-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);cursor:pointer;font-size:11px;color:var(--muted);font-family:var(--ff);transition:all .12s;white-space:nowrap;}
+.tl-btn:hover{border-color:var(--blue);color:var(--text)}
+.app{display:flex;flex-direction:column;height:100vh}
+.main{flex:1;overflow-y:auto}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 24px 80px}
+.rev-hdr{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.rev-title{font-size:20px;font-weight:700;flex:1}
+.search-wrap{display:flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:7px 13px;min-width:280px}
+.search-icon{font-size:14px;color:var(--muted);flex-shrink:0}
+.search-input{background:transparent;border:none;padding:0;font-size:13px;flex:1;box-shadow:none;outline:none;color:var(--text)}
+.filter-row{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.fpill{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surf);font-size:11px;cursor:pointer;color:var(--muted);transition:all .12s}
+.fpill:hover{border-color:var(--border2);color:var(--text)}
+.fpill.active{background:var(--blue-d);border-color:var(--blue);color:var(--blue);font-weight:600}
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px}
+.stat-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.stat-val{font-family:var(--ffm);font-size:22px;font-weight:700}
+.sec-hdr{display:flex;align-items:center;gap:8px;margin:18px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sec-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sec-label{font-size:12px;font-weight:700;color:var(--text)}
+.sec-count{font-size:11px;color:var(--muted)}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;margin-bottom:8px}
+.rev-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;transition:border-color .12s;cursor:pointer}
+.rev-card:hover{border-color:var(--border2)}
+.rev-card-top{padding:13px 14px 10px;border-left:3px solid}
+.rev-card-meta{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.rev-card-co{font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.rev-score{font-family:var(--ffm);font-size:18px;font-weight:700;flex-shrink:0}
+.rev-submitter{font-size:11px;color:var(--muted);margin-bottom:3px}
+.rev-headline{font-size:12px;color:var(--muted);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rev-card-foot{padding:8px 14px;background:rgba(0,0,0,.15);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.rev-foot-tag{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.rev-foot-tag b{color:var(--text)}
+.rev-expand{background:var(--surf2);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;margin-bottom:10px}
+.exp-tabs{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
+.exp-tab{padding:4px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf);font-size:12px;cursor:pointer;color:var(--muted);transition:all .12s}
+.exp-tab.active{border-color:var(--blue);background:var(--blue-d);color:var(--blue);font-weight:600}
+.exp-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.lbl{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:700}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#ffffff;--surf2:#f4f6fb;--border:#dde1ed;--border2:#c5cbe0;--blue:#2563eb;--blue-d:rgba(37,99,235,.1);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0;}
+html[data-theme="light"] body{color-scheme:light}
+/* commodity table in reviews */
+.comm-table{width:100%;font-size:11px;border-collapse:collapse;margin-top:8px}
+.comm-table th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+.comm-table td{padding:5px 8px;border-bottom:1px solid var(--border)}
+
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#ffffff;--surf2:#f4f6fb;--surf3:#edf0f8;--border:#dde1ed;--border2:#c5cbe0;--blue:#2563eb;--blue-d:rgba(37,99,235,.1);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0;}
+html[data-theme="light"] body{color-scheme:light}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topnav{flex-shrink:0;background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;gap:0;flex-shrink:0;position:relative;z-index:100}
+.main{flex:1;overflow-y:auto;min-height:0}
+</style>
+</head>
+<body>
+<div class="app">
+<div id="nav-placeholder"></div>
+<div class="main">
+  <div class="wrap" id="wrap">
+    <div class="rev-hdr">
+      <div class="rev-title">DD Reviews</div>
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input" id="search-box" placeholder="Search company, submitter, strategy, key..." oninput="filterReviews(this.value)">
+      </div>
+      <a href="intake.html" class="btn-p" style="text-decoration:none;font-size:12px">+ New intake</a>
+    </div>
+    <div id="stats-bar"></div>
+    <div class="filter-row" id="filter-row"></div>
+    <div id="reviews-body"></div>
+  </div>
+</div>
+<div class="pg-footer"><span>Prime Alpha Securities</span> &nbsp;&middot;&nbsp; Alternative Investment Fund Manager &nbsp;&middot;&nbsp; African Markets &nbsp;&middot;&nbsp; Confidential</div>
+</div>
+<div class="toast-wrap" id="toasts"></div>
+<script>
+// ── local-engine.js (inlined) ──────────────────────────────
+/**
+ * DD Engine — Local Analysis Engine
+ * Prime Alpha Securities
+ *
+ * Runs entirely offline. No API calls. No paid services.
+ * Reads document text and form data, applies investment analysis rules,
+ * returns structured JSON in the same format as the Claude API version.
+ *
+ * Include this script in all three HTML pages.
+ */
+
+window.LocalEngine = (function() {
+
+  // ── Text extraction from uploaded file ──────────────────────────────────────
+  async function extractText(file) {
+    /**
+     * Extracts plain text from a file for analysis.
+     * PDF: uses pdf.js (loaded from CDN — free, open source).
+     * DOCX/TXT/CSV: reads as text directly.
+     * Returns { text: string, pageCount: number, extracted: boolean }
+     */
+    const ext = (file.name || '').split('.').pop().toLowerCase();
+
+    // Plain text files
+    if (['txt', 'csv', 'md'].includes(ext)) {
+      const text = await readAsText(file);
+      return { text, pageCount: 1, extracted: true };
+    }
+
+    // DOCX — read raw XML text (good enough for keyword analysis)
+    if (['docx', 'doc'].includes(ext)) {
+      try {
+        const arrayBuffer = await readAsArrayBuffer(file);
+        // DOCX is a ZIP — try to extract word/document.xml text
+        // Without JSZip we can still extract visible strings
+        const text = extractStringsFromBinary(arrayBuffer);
+        return { text, pageCount: 1, extracted: true };
+      } catch {
+        return { text: '', pageCount: 0, extracted: false };
+      }
+    }
+
+    // PDF — use pdf.js if available
+    if (ext === 'pdf') {
+      if (window.pdfjsLib) {
+        try {
+          const arrayBuffer = await readAsArrayBuffer(file);
+          const pdf   = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let   text  = '';
+          for (let i = 1; i <= Math.min(pdf.numPages, 40); i++) {
+            const page    = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(s => s.str).join(' ') + '\n';
+          }
+          return { text, pageCount: pdf.numPages, extracted: true };
+        } catch (e) {
+          console.warn('[LocalEngine] PDF.js error:', e.message);
+        }
+      }
+      // Fallback: extract printable ASCII strings from binary
+      const ab   = await readAsArrayBuffer(file);
+      const text = extractStringsFromBinary(ab);
+      return { text, pageCount: 1, extracted: text.length > 100 };
+    }
+
+    return { text: '', pageCount: 0, extracted: false };
+  }
+
+  function readAsText(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload  = e => res(e.target.result);
+      r.onerror = rej;
+      r.readAsText(file);
+    });
+  }
+
+  function readAsArrayBuffer(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload  = e => res(e.target.result);
+      r.onerror = rej;
+      r.readAsArrayBuffer(file);
+    });
+  }
+
+  function extractStringsFromBinary(arrayBuffer) {
+    const bytes = new Uint8Array(arrayBuffer);
+    let str = '', result = '';
+    for (let i = 0; i < bytes.length; i++) {
+      const c = bytes[i];
+      if (c >= 32 && c < 127) {
+        str += String.fromCharCode(c);
+      } else {
+        if (str.length >= 5) result += str + ' ';
+        str = '';
+      }
+    }
+    return result.slice(0, 50000); // cap at 50KB
+  }
+
+  // ── Keyword extraction helpers ───────────────────────────────────────────────
+  function extractNumber(text, patterns) {
+    for (const p of patterns) {
+      const m = text.match(p);
+      if (m) {
+        const raw = m[1].replace(/[,$]/g, '');
+        return parseFloat(raw) || null;
+      }
+    }
+    return null;
+  }
+
+  function findKeywords(text, keywords) {
+    const lc = text.toLowerCase();
+    return keywords.filter(k => lc.includes(k.toLowerCase()));
+  }
+
+  function countKeywords(text, keywords) {
+    return findKeywords(text, keywords).length;
+  }
+
+  // ── Document classification ──────────────────────────────────────────────────
+  function classifyDocument(text, fileName, meta) {
+    const lc   = text.toLowerCase();
+    const name = (fileName || '').toLowerCase();
+
+    // Detect document type by keywords
+    const typeMap = [
+      { type: 'audit_report',       keywords: ['audited financial', 'audit opinion', 'kpmg', 'pwc', 'deloitte', 'ernst & young', 'independent auditor'] },
+      { type: 'financial_model',    keywords: ['projected revenue', 'ebitda margin', 'financial projections', 'forecast', 'irr', 'npv', 'dcf'] },
+      { type: 'term_sheet',         keywords: ['term sheet', 'conditions precedent', 'representations and warranties', 'closing date', 'long stop'] },
+      { type: 'legal_contract',     keywords: ['shareholder agreement', 'subscription agreement', 'shareholders deed', 'articles of association', 'memorandum'] },
+      { type: 'cim',                keywords: ['confidential information memorandum', 'investment highlights', 'management team', 'market opportunity', 'executive summary'] },
+      { type: 'pitch_deck',         keywords: ['series a', 'series b', 'seed round', 'runway', 'traction', 'market size', 'total addressable market'] },
+      { type: 'warehouse_receipt',  keywords: ['warehouse receipt', 'afex', 'ecx', 'gcx', 'grade a', 'moisture content', 'metric tonnes'] },
+      { type: 'valuation_report',   keywords: ['independent valuation', 'market value', 'capitalisation rate', 'discounted cash flow', 'comparable transactions'] },
+    ];
+
+    let best = 'other', bestScore = 0;
+    for (const { type, keywords } of typeMap) {
+      const score = countKeywords(lc, keywords);
+      if (score > bestScore) { bestScore = score; best = type; }
+    }
+
+    const confidence = Math.min(0.5 + bestScore * 0.12, 0.97);
+
+    // Extract company name from text
+    const coPatterns = [
+      /(?:company|corporation|ltd|limited|sarl|sa|plc|inc|llc)[:\s]+([A-Z][A-Za-z\s&.,]+)/,
+      /([A-Z][A-Za-z\s&]+(?:Ltd|Limited|SARL|SA|Plc|Inc|LLC))/,
+    ];
+    let company = meta?.company_name || '';
+    if (!company) {
+      for (const p of coPatterns) {
+        const m = text.match(p);
+        if (m) { company = m[1].trim().slice(0, 60); break; }
+      }
+    }
+
+    // Extract period
+    const yearMatch = text.match(/\b(20[12][0-9])\b/g);
+    const period    = yearMatch ? yearMatch[yearMatch.length - 1] : '2024';
+
+    // Data quality
+    const dataQuality = bestScore >= 3 ? 'high' : bestScore >= 1 ? 'medium' : 'low';
+
+    // Key topics
+    const topicKeywords = [
+      'Revenue', 'EBITDA', 'IRR', 'MOIC', 'Valuation', 'Collateral',
+      'Governance', 'ESG', 'Debt', 'Equity', 'Exit', 'Covenant',
+      'FX', 'Currency', 'Regulatory', 'Compliance', 'KYC', 'AML',
+    ];
+    const topics = topicKeywords.filter(t => lc.includes(t.toLowerCase())).slice(0, 5);
+
+    // Summary
+    const firstSentences = text.replace(/\s+/g, ' ').slice(0, 400).trim();
+
+    return {
+      document_type: best,
+      confidence: Math.round(confidence * 100) / 100,
+      company_name: company || 'Unknown',
+      period,
+      data_quality: dataQuality,
+      summary: firstSentences ? `${firstSentences}…` : `${best.replace(/_/g,' ')} document analysed.`,
+      key_topics: topics.length ? topics : ['Investment Analysis'],
+    };
+  }
+
+  // ── Financial analysis ───────────────────────────────────────────────────────
+  function analyseFinancials(text, meta) {
+    const lc = text.toLowerCase();
+
+    const revenue = extractNumber(text, [
+      /revenue[:\s]+\$?([\d,]+(?:\.\d+)?)\s*(?:million|m\b)?/i,
+      /turnover[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+      /total\s+revenue[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+    ]);
+
+    const ebitda = extractNumber(text, [
+      /ebitda[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+      /operating\s+profit[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+    ]);
+
+    const netIncome = extractNumber(text, [
+      /net\s+(?:income|profit)[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+      /profit\s+after\s+tax[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+    ]);
+
+    const debt = extractNumber(text, [
+      /(?:total\s+)?debt[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+      /borrowings[:\s]+\$?([\d,]+(?:\.\d+)?)/i,
+    ]);
+
+    // Calculate ratios
+    const ebitdaMargin = (revenue && ebitda) ? Math.round(ebitda / revenue * 100) : null;
+    const debtToEquity = (debt && revenue)   ? Math.round(debt / revenue * 10) / 10 : null;
+
+    // Revenue growth from historical mentions
+    const growthMatch = text.match(/(?:revenue\s+growth|grew|increased)[:\s]+(\d+(?:\.\d+)?)\s*%/i);
+    const revenueGrowth = growthMatch ? parseFloat(growthMatch[1]) : null;
+
+    // Red flags
+    const redFlags = [];
+    if (lc.includes('going concern'))    redFlags.push('Going concern note in audit opinion');
+    if (lc.includes('material weakness')) redFlags.push('Material weakness in internal controls');
+    if (lc.includes('restatement'))      redFlags.push('Financial restatement identified');
+    if (lc.includes('qualified opinion')) redFlags.push('Qualified audit opinion');
+    if (ebitdaMargin !== null && ebitdaMargin < 0) redFlags.push('Negative EBITDA margin');
+    if (debtToEquity !== null && debtToEquity > 3)  redFlags.push('High leverage ratio: ' + debtToEquity + 'x');
+    if (!revenue && !ebitda)              redFlags.push('No financial figures extracted — verify document quality');
+
+    return {
+      period: meta?.period || '2024',
+      currency: lc.includes('ngn') || lc.includes('naira') ? 'NGN'
+               : lc.includes('xaf') || lc.includes('fcfa') ? 'XAF'
+               : lc.includes('kes') ? 'KES'
+               : lc.includes('zar') ? 'ZAR'
+               : 'USD',
+      income_statement: {
+        revenue:    revenue || null,
+        ebitda:     ebitda  || null,
+        net_income: netIncome || null,
+      },
+      ratios: {
+        ebitda_margin_pct:  ebitdaMargin,
+        revenue_growth_pct: revenueGrowth,
+        debt_to_equity:     debtToEquity,
+      },
+      historical_data: [],
+      red_flags: redFlags,
+    };
+  }
+
+  // ── Legal analysis ───────────────────────────────────────────────────────────
+  function analyseLegal(text, meta) {
+    const lc = text.toLowerCase();
+
+    const docType = lc.includes('shareholder') ? 'Shareholder Agreement'
+                  : lc.includes('subscription') ? 'Subscription Agreement'
+                  : lc.includes('term sheet')   ? 'Term Sheet'
+                  : lc.includes('facility')     ? 'Facility Agreement'
+                  : lc.includes('lease')        ? 'Lease Agreement'
+                  : 'Legal Document';
+
+    // Party extraction
+    const parties = [];
+    const partyMatch = text.match(/between[:\s]+([A-Z][A-Za-z\s,&.()]+?)(?:and|,)/i);
+    if (partyMatch) parties.push(partyMatch[1].trim().slice(0, 80));
+    if (lc.includes('prime alpha')) parties.push('Prime Alpha Securities');
+
+    // Governing law
+    const lawMatch = text.match(/governed\s+by[:\s]+(?:the\s+laws?\s+of\s+)?([A-Z][A-Za-z\s]+?)(?:\.|,|\n)/i);
+    const governingLaw = lawMatch ? lawMatch[1].trim().slice(0, 60) : 'Not specified';
+
+    // Risk provisions
+    const riskProvisions = [];
+    if (!lc.includes('drag-along') && !lc.includes('drag along'))
+      riskProvisions.push('No drag-along provision identified');
+    if (!lc.includes('tag-along') && !lc.includes('tag along'))
+      riskProvisions.push('No tag-along provision identified');
+    if (!lc.includes('non-compete') && !lc.includes('non compete'))
+      riskProvisions.push('Non-compete clause not identified');
+    if (!lc.includes('representations') && !lc.includes('warranties'))
+      riskProvisions.push('Representations and warranties not found — verify document');
+
+    return {
+      document_type: docType,
+      parties: parties.length ? parties : ['Counterparties not extracted'],
+      governing_law: governingLaw,
+      key_terms: {},
+      risk_provisions: riskProvisions.length ? riskProvisions : ['No significant risk provisions flagged'],
+      analyst_notes: `${docType} reviewed. ${parties.length ? parties.join(' and ') + ' identified as parties.' : ''} Standard due diligence review recommended.`,
+    };
+  }
+
+  // ── Risk analysis ────────────────────────────────────────────────────────────
+  function analyseRisk(text, meta, classification) {
+    const lc = text.toLowerCase();
+
+    // Count risk signals
+    const highRiskSignals = findKeywords(lc, [
+      'default', 'litigation', 'going concern', 'sanctions', 'fraud', 'corruption',
+      'material weakness', 'qualified opinion', 'restatement', 'bankruptcy', 'insolvency',
+      'criminal', 'money laundering', 'bribery',
+    ]);
+
+    const medRiskSignals = findKeywords(lc, [
+      'concentration', 'key man', 'key-man', 'single customer', 'regulatory risk',
+      'currency risk', 'fx risk', 'interest rate', 'refinancing', 'covenant breach',
+      'competitive pressure', 'market risk', 'political risk', 'country risk',
+    ]);
+
+    const positiveSignals = findKeywords(lc, [
+      'growth', 'profitable', 'market leader', 'diversified', 'long-term contract',
+      'recurring revenue', 'audited', 'clean opinion', 'experienced management',
+      'collateralised', 'secured', 'insurance', 'hedged',
+    ]);
+
+    const riskScore = Math.min(10, Math.max(1,
+      3 + highRiskSignals.length * 2 + medRiskSignals.length - positiveSignals.length
+    ));
+
+    const riskLevel = riskScore <= 3 ? 'low'
+                    : riskScore <= 5 ? 'medium'
+                    : riskScore <= 7 ? 'high'
+                    : 'critical';
+
+    const recommendation = riskScore <= 3 ? 'proceed'
+                         : riskScore <= 5 ? 'proceed_with_caution'
+                         : riskScore <= 7 ? 'further_diligence_required'
+                         : 'do_not_proceed';
+
+    // Build risk flags
+    const flags = [];
+    if (highRiskSignals.length) {
+      flags.push({
+        severity: 'high',
+        category: 'compliance',
+        title: 'High-risk keywords detected',
+        detail: `The following risk signals were identified in the document: ${highRiskSignals.slice(0,4).join(', ')}.`,
+        mitigation: 'Request clarification and additional documentation on each flagged item.',
+      });
+    }
+    if (medRiskSignals.length) {
+      flags.push({
+        severity: 'medium',
+        category: 'market',
+        title: 'Medium-risk factors identified',
+        detail: `Risk factors noted: ${medRiskSignals.slice(0,3).join(', ')}.`,
+        mitigation: 'Assess materiality and request management commentary.',
+      });
+    }
+    if (!flags.length) {
+      flags.push({
+        severity: 'low',
+        category: 'general',
+        title: 'No critical risk flags identified',
+        detail: 'Document text analysis did not surface critical risk keywords. Standard diligence applies.',
+        mitigation: 'Proceed with standard investment committee review.',
+      });
+    }
+
+    return {
+      overall_risk_score:         riskScore,
+      overall_risk_level:         riskLevel,
+      investment_recommendation:  recommendation,
+      summary: `Risk score ${riskScore}/10 (${riskLevel}). ${highRiskSignals.length} high-risk signal(s) and ${medRiskSignals.length} medium-risk factor(s) identified from document text analysis.`,
+      risk_flags: flags,
+      strengths: positiveSignals.slice(0, 4).map(s => s.charAt(0).toUpperCase() + s.slice(1)) || ['No specific strengths extracted'],
+      diligence_gaps: [
+        'Management accounts for most recent quarter',
+        'Reference checks on key counterparties',
+        'Independent legal review of key clauses',
+      ],
+    };
+  }
+
+  // ── Summary ──────────────────────────────────────────────────────────────────
+  function buildSummary(classification, financials, risk) {
+    const docType  = (classification?.document_type || 'document').replace(/_/g, ' ');
+    const company  = classification?.company_name || 'the company';
+    const rScore   = risk?.overall_risk_score || 5;
+    const rLevel   = risk?.overall_risk_level  || 'medium';
+    const rec      = risk?.investment_recommendation || 'further_diligence_required';
+
+    const recLabel = {
+      proceed:                    'Proceed — risk profile acceptable',
+      proceed_with_caution:       'Proceed with caution — monitor key risks',
+      further_diligence_required: 'Further diligence required before commitment',
+      do_not_proceed:             'Do not proceed — unacceptable risk profile',
+    }[rec] || rec;
+
+    return {
+      headline: `${company} — ${recLabel}`,
+      executive_summary: `This ${docType} for ${company} has been reviewed. The overall risk score is ${rScore}/10 (${rLevel}). ${risk?.summary || ''} Standard investment committee review is recommended before any commitment.`,
+      key_highlights: (risk?.strengths || []).slice(0, 3),
+      key_concerns:   (risk?.risk_flags || []).slice(0, 3).map(f => f.title),
+      next_steps: [
+        'Present to Investment Committee for initial screening',
+        'Commission independent legal review',
+        'Request management accounts and projections',
+        'Conduct reference calls with key counterparties',
+      ],
+    };
+  }
+
+  // ── Master analysis entry point ───────────────────────────────────────────────
+  /**
+   * analyseDocument(file, meta, type)
+   * file: File object or null (for form-only analysis)
+   * meta: { company_name, deal_name, doc_type, strategy }
+   * type: 'full' | 'classification' | 'financial' | 'legal' | 'risk' | 'summary'
+   * Returns the same JSON structure as the Claude API version.
+   */
+  async function analyseDocument(file, meta, type) {
+    let text = '';
+    let pageCount = 0;
+    let extracted = false;
+
+    if (file) {
+      const r = await extractText(file);
+      text      = r.text;
+      pageCount = r.pageCount;
+      extracted = r.extracted;
+    }
+
+    const classification = classifyDocument(text, file?.name, meta);
+    const financials     = analyseFinancials(text, meta);
+    const legal          = analyseLegal(text, meta);
+    const risk           = analyseRisk(text, meta, classification);
+    const summary        = buildSummary(classification, financials, risk);
+
+    const full = { classification, financial: financials, legal, risk, summary };
+
+    if (type === 'full')           return full;
+    if (type === 'classification') return { classification };
+    if (type === 'financial')      return { financial: financials };
+    if (type === 'legal')          return { legal };
+    if (type === 'risk')           return { risk };
+    if (type === 'summary')        return { summary };
+    return full;
+  }
+
+  /**
+   * analyseForm(formData, strategy)
+   * For intake forms — no document, pure form-data analysis.
+   * Builds a text representation of the form and runs analysis.
+   */
+  async function analyseForm(formData, strategy) {
+    // Convert form data to readable text for the analysis engine
+    const lines = Object.entries(formData)
+      .filter(([k, v]) => v && !['strategy','submittedAt','docName','docB64'].includes(k))
+      .map(([k, v]) => `${k.replace(/_/g,' ')}: ${v}`);
+    const text = lines.join('\n');
+
+    const classification = {
+      document_type: strategy + '_intake_form',
+      confidence: 0.95,
+      company_name: formData.co || formData.company || formData.commodity || 'Submitted Entity',
+      period: new Date().getFullYear().toString(),
+      data_quality: 'high',
+      summary: `${strategy.toUpperCase()} deal intake form submitted by ${formData.name || 'analyst'}.`,
+      key_topics: [strategy.toUpperCase(), 'Deal Intake', 'PAS Screening'],
+    };
+
+    const risk    = analyseRisk(text, formData, classification);
+    const summary = buildSummary(classification, {}, risk);
+
+    // For credit forms, apply the internal grading logic
+    let creditGrade = null;
+    if (strategy === 'credit') {
+      creditGrade = gradeCreditRisk(formData);
+      if (creditGrade) {
+        risk.credit_grade     = creditGrade.grade;
+        risk.pd_range         = creditGrade.pd_range;
+        risk.suggested_rate   = creditGrade.rate;
+        summary.headline      = `${classification.company_name} — Credit Grade ${creditGrade.grade} — ${creditGrade.rate_label}`;
+      }
+    }
+
+    return { classification, risk, summary, credit_grade: creditGrade };
+  }
+
+  // ── Credit grading (mirrors the intake form credit engine) ───────────────────
+  function gradeCreditRisk(d) {
+    const rev    = parseFloat(d['cr-rev'] || d.rev || 0);
+    const ebitda = parseFloat(d['cr-ebitda'] || d.ebitda || 0);
+    const debt   = parseFloat(d['cr-debt'] || d.debt || 0);
+    const ds     = parseFloat(d['cr-ds'] || d.ds || 0);
+    const amount = parseFloat(d['cr-amount'] || d.amount || 0);
+
+    if (!amount) return null;
+
+    const dscr        = ds > 0 ? (ebitda / ds) : null;
+    const ebitdaMargin = rev > 0 ? ebitda / rev : 0;
+    const leverage    = rev > 0 ? debt / rev : 0;
+
+    let score = 5; // start neutral
+    if (dscr !== null) {
+      if (dscr >= 2.5) score -= 2;
+      else if (dscr >= 1.5) score -= 1;
+      else if (dscr < 1.2) score += 2;
+      else if (dscr < 1.0) score += 3;
+    }
+    if (ebitdaMargin > 0.20) score -= 1;
+    if (ebitdaMargin < 0.05) score += 1;
+    if (leverage > 2) score += 1;
+    if (leverage > 4) score += 1;
+
+    score = Math.max(1, Math.min(10, score));
+
+    const GRADES = [
+      { min:1, max:1, grade:'G1', pd:'1–2%',   rate: '12–14%', label:'Excellent — Prime rate' },
+      { min:2, max:2, grade:'G2', pd:'2–4%',   rate: '14–16%', label:'Strong' },
+      { min:3, max:3, grade:'G3', pd:'4–7%',   rate: '16–19%', label:'Good' },
+      { min:4, max:4, grade:'G4', pd:'7–12%',  rate: '19–22%', label:'Acceptable' },
+      { min:5, max:5, grade:'G5', pd:'12–18%', rate: '22–26%', label:'Borderline' },
+      { min:6, max:6, grade:'G6', pd:'18–25%', rate: '26–32%', label:'Weak' },
+      { min:7, max:7, grade:'G7', pd:'25–35%', rate: '32–38%', label:'Speculative' },
+      { min:8, max:8, grade:'G8', pd:'35–50%', rate: '38–45%', label:'High risk' },
+      { min:9, max:9, grade:'G9', pd:'50–70%', rate: '45–55%', label:'Very high risk' },
+      { min:10,max:10,grade:'G10',pd:'70–100%',rate: '55%+',   label:'Extreme risk' },
+    ];
+
+    const g = GRADES.find(r => score >= r.min && score <= r.max) || GRADES[4];
+    return {
+      grade:      g.grade,
+      pd_range:   g.pd,
+      rate:       g.rate,
+      rate_label: g.label,
+      score,
+      dscr:       dscr ? Math.round(dscr * 100) / 100 : null,
+    };
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────────
+  return { analyseDocument, analyseForm, extractText, gradeCreditRisk };
+
+})();
+
+</script>
+<script>
+// ── shared.js (inlined) ──────────────────────────────────
+// ── DD Engine — Shared JS (loaded first by all pages) ──────────────────────────
+// IMPORTANT: This file must be loaded BEFORE page-specific scripts.
+// It defines all shared globals. Pages call init() at the end of their own script.
+
+// ── Theme ──────────────────────────────────────────────────────────────────────
+var CUR_THEME = localStorage.getItem('dd_theme') || 'dark';
+var CUR_LANG  = localStorage.getItem('dd_lang')  || 'en';
+
+function applyTheme(t) {
+  CUR_THEME = t;
+  var el = document.getElementById('__tv__');
+  if (!el) {
+    el = document.createElement('style');
+    el.id = '__tv__';
+    document.head.appendChild(el);
+  }
+  if (t === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    el.textContent = [
+      ':root{',
+      '--bg:#f0f2f7!important;',
+      '--surf:#ffffff!important;',
+      '--surf2:#f4f6fb!important;',
+      '--surf3:#edf0f8!important;',
+      '--border:#dde1ed!important;',
+      '--border2:#c5cbe0!important;',
+      '--blue:#2563eb!important;',
+      '--blue-d:rgba(37,99,235,.1)!important;',
+      '--green:#16a34a!important;',
+      '--red:#dc2626!important;',
+      '--amber:#d97706!important;',
+      '--gold:#b45309!important;',
+      '--purple:#7c3aed!important;',
+      '--text:#0f172a!important;',
+      '--muted:#64748b!important;',
+      '--dim:#e2e8f0!important;',
+      '}'
+    ].join('');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    el.textContent = '';
+  }
+  localStorage.setItem('dd_theme', t);
+  var btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = t === 'dark' ? '☀ Light' : '◑ Dark';
+}
+
+function toggleTheme() { applyTheme(CUR_THEME === 'dark' ? 'light' : 'dark'); }
+
+function applyLang(l) {
+  CUR_LANG = l;
+  localStorage.setItem('dd_lang', l);
+  var btn = document.getElementById('lang-btn');
+  if (btn) btn.textContent = l === 'en' ? '🇫🇷 FR' : '🇬🇧 EN';
+}
+function toggleLang() { applyLang(CUR_LANG === 'en' ? 'fr' : 'en'); }
+
+// ── Connection ─────────────────────────────────────────────────────────────────
+// Migrate old key
+(function() {
+  var old = localStorage.getItem('pas_connection');
+  if (old && !localStorage.getItem('dd_connection')) {
+    try {
+      var o = JSON.parse(old);
+      localStorage.setItem('dd_connection', JSON.stringify({
+        anthropicKey: o.apiKey || '', alphacore: o.alphacore || '',
+        ddengine: o.ddengine || '', autoops: o.autoops || ''
+      }));
+    } catch(e) {}
+  }
+})();
+
+var DD_CONN = {};
+try { DD_CONN = JSON.parse(localStorage.getItem('dd_connection') || '{}'); } catch(e) {}
+
+function updateConnectUI() {
+  var connected = !!(DD_CONN.anthropicKey || DD_CONN.alphacore);
+  var dot  = document.getElementById('connect-dot');
+  var lbl  = document.getElementById('connect-label');
+  var cbtn = document.querySelector('.connect-btn');
+  if (dot)  dot.classList.toggle('on', connected);
+  if (lbl)  lbl.textContent = connected ? 'Connected' : 'Connect';
+  if (cbtn) cbtn.classList.toggle('connected', connected);
+  var fields = { 'cp-anthropic': DD_CONN.anthropicKey, 'cp-ac-url': DD_CONN.alphacore,
+                 'cp-dd-url': DD_CONN.ddengine, 'cp-ao-url': DD_CONN.autoops };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && fields[id]) el.value = fields[id];
+  });
+}
+
+function toggleConnect() {
+  var p = document.getElementById('connect-panel');
+  if (!p) return;
+  var open = p.style.display === 'none' || !p.style.display;
+  p.style.display = open ? 'block' : 'none';
+  if (open) updateConnectUI();
+}
+
+function saveConnect() {
+  var ak = (document.getElementById('cp-anthropic') || {}).value || '';
+  var ac = (document.getElementById('cp-ac-url')    || {}).value || '';
+  var dd = (document.getElementById('cp-dd-url')    || {}).value || '';
+  var ao = (document.getElementById('cp-ao-url')    || {}).value || '';
+  ak = ak.trim(); ac = ac.trim(); dd = dd.trim(); ao = ao.trim();
+  var st = document.getElementById('cp-status');
+  if (!ak && !ac) {
+    if (st) st.innerHTML = '<span style="color:var(--amber)">Add at least an Anthropic API key.</span>';
+    return;
+  }
+  DD_CONN = { anthropicKey: ak, alphacore: ac, ddengine: dd, autoops: ao };
+  localStorage.setItem('dd_connection', JSON.stringify(DD_CONN));
+  if (window.ddEngine && window.ddEngine.saveApiKey && ak) window.ddEngine.saveApiKey(ak);
+  if (window.ddEngine && window.ddEngine.saveConfig) window.ddEngine.saveConfig(DD_CONN);
+  updateConnectUI();
+  if (st) st.innerHTML = '<span style="color:var(--green)">✓ Saved</span>';
+  setTimeout(function() {
+    var p = document.getElementById('connect-panel');
+    if (p) p.style.display = 'none';
+  }, 1400);
+}
+
+function clearConnect() {
+  DD_CONN = {};
+  localStorage.removeItem('dd_connection');
+  ['cp-anthropic','cp-ac-url','cp-dd-url','cp-ao-url'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  updateConnectUI();
+}
+
+// ── Anthropic API ──────────────────────────────────────────────────────────────
+async function getAnthropicKey() {
+  if (window.ddEngine && window.ddEngine.getApiKey) {
+    var k = await window.ddEngine.getApiKey();
+    if (k) return k;
+  }
+  return DD_CONN.anthropicKey || '';
+}
+
+async function callAnthropic(messages, sys, maxTok) {
+  var key = await getAnthropicKey();
+  if (!key) throw new Error('No Anthropic API key — click Connect and enter your sk-ant-… key.');
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTok || 2500,
+      system: sys || 'Return ONLY valid JSON. No markdown fences.',
+      messages: messages
+    })
+  });
+  if (!resp.ok) {
+    var e = await resp.json().catch(function() { return {}; });
+    throw new Error((e.error && e.error.message) || ('API error ' + resp.status));
+  }
+  var data = await resp.json();
+  var text = (data.content || []).map(function(c) { return c.text || ''; }).join('');
+  text = text.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(text); } catch(e) { return { raw: text, parse_error: true }; }
+}
+
+// ── Storage ────────────────────────────────────────────────────────────────────
+var STORE_KEY = 'dd_reviews_v2';
+
+async function saveReview(entry) {
+  // Electron IPC
+  if (window.ddEngine && window.ddEngine.saveReview) {
+    try { await window.ddEngine.saveReview(entry); } catch(e) {}
+  }
+  // localStorage
+  var all = getAllReviewsLocal();
+  var idx = all.findIndex(function(r) { return r.key === entry.key; });
+  if (idx !== -1) all[idx] = entry; else all.unshift(entry);
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(all)); } catch(e) {}
+}
+
+function getAllReviewsLocal() {
+  var stored = [];
+  try { stored = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch(e) {}
+  // Also scan legacy keys
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && (k.startsWith('PAS_DD_') || k.startsWith('pas_dd_'))) {
+        try {
+          var r = JSON.parse(localStorage.getItem(k));
+          if (r && r.key && !stored.find(function(x) { return x.key === r.key; })) stored.push(r);
+        } catch(e) {}
+      }
+    }
+  } catch(e) {}
+  return stored;
+}
+
+async function deleteReviewByKey(key) {
+  if (window.ddEngine && window.ddEngine.deleteReview) {
+    try { await window.ddEngine.deleteReview(key); } catch(e) {}
+  }
+  var all = getAllReviewsLocal().filter(function(r) { return r.key !== key; });
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(all)); } catch(e) {}
+  try { localStorage.removeItem(key); } catch(e) {}
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function toast(msg, col) {
+  var wrap = document.getElementById('toasts');
+  if (!wrap) return;
+  var d = document.createElement('div');
+  d.className = 'toast';
+  d.style.borderLeftColor = col || 'var(--green)';
+  d.textContent = msg;
+  wrap.appendChild(d);
+  setTimeout(function() { if (d.parentNode) d.parentNode.removeChild(d); }, 3500);
+}
+
+function tag(label, c) {
+  c = c || '#4a7cff';
+  return '<span class="tag" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '44">' + label + '</span>';
+}
+
+function recLabel(val) {
+  var m = {
+    en: { proceed:'Proceed', proceed_with_caution:'Proceed with caution',
+          further_diligence_required:'Further diligence', do_not_proceed:'Do not proceed',
+          approve:'Approve', reject:'Reject' },
+    fr: { proceed:'Approuver', proceed_with_caution:'Approuver avec prudence',
+          further_diligence_required:'Diligence supplémentaire', do_not_proceed:'Ne pas investir',
+          approve:'Approuver', reject:'Rejeter' }
+  };
+  var l = CUR_LANG || 'en';
+  var norm = (val || '').toLowerCase().replace(/ /g, '_').trim();
+  return (m[l] && m[l][norm]) || (m[l] && m[l][val]) || (m.en[norm]) || val || '';
+}
+
+// ── Connect panel HTML ─────────────────────────────────────────────────────────
+function renderConnectPanel() {
+  return '<div class="connect-panel" id="connect-panel" style="display:none">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<div style="font-size:13px;font-weight:700">Company connection</div>' +
+      '<button onclick="toggleConnect()" style="font-size:16px;color:var(--muted);line-height:1">&#10005;</button>' +
+    '</div>' +
+    '<p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px">Add your keys to enable live AI analysis. Works offline without them.</p>' +
+    '<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)">AI Analysis</div>' +
+    '<div style="margin-bottom:10px"><label class="cp-lbl">Anthropic API key</label><input id="cp-anthropic" type="password" placeholder="sk-ant-..." class="cp-input"></div>' +
+    '<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border)">AlphaCore (optional)</div>' +
+    '<div style="margin-bottom:8px"><label class="cp-lbl">AlphaCore URL</label><input id="cp-ac-url" placeholder="http://localhost:8080" class="cp-input"></div>' +
+    '<div style="margin-bottom:8px"><label class="cp-lbl">DD Engine URL</label><input id="cp-dd-url" placeholder="http://localhost:8081" class="cp-input"></div>' +
+    '<div style="margin-bottom:8px"><label class="cp-lbl">AutoOps URL</label><input id="cp-ao-url" placeholder="http://localhost:8082" class="cp-input"></div>' +
+    '<div style="display:flex;gap:8px;margin-top:14px">' +
+      '<button class="cp-save" onclick="saveConnect()">Save &amp; connect</button>' +
+      '<button class="cp-cancel" onclick="toggleConnect()">Cancel</button>' +
+      '<button class="cp-clear" onclick="clearConnect()">Disconnect</button>' +
+    '</div>' +
+    '<div id="cp-status" style="font-size:11px;margin-top:8px"></div>' +
+  '</div>';
+}
+
+function renderNav(active) {
+  var pages = [
+    ['documents.html', '◆ Documents'],
+    ['intake.html',    '＋ New Intake'],
+    ['reviews.html',   '📄 DD Reviews']
+  ];
+  var links = pages.map(function(p) {
+    return '<a class="nav-item' + (p[0] === active ? ' active' : '') + '" href="' + p[0] + '">' + p[1] + '</a>';
+  }).join('\n');
+  return '<nav class="topnav">' +
+    '<div class="nav-brand"><span class="nav-logo">DD Engine</span><span class="nav-sep">|</span><span class="nav-sub">Automated Due Diligence</span></div>' +
+    '<div class="nav-links">' + links + '</div>' +
+    '<div class="nav-right">' +
+      '<button id="theme-btn" class="tl-btn" onclick="toggleTheme()">☀ Light</button>' +
+      '<button id="lang-btn"  class="tl-btn" onclick="toggleLang()">🇫🇷 FR</button>' +
+      '<div class="connect-btn" onclick="toggleConnect()">' +
+        '<span class="connect-dot" id="connect-dot"></span>' +
+        '<span id="connect-label">Connect</span>' +
+        '<span style="font-size:10px;opacity:.6">&#9660;</span>' +
+      '</div>' +
+    '</div>' +
+  '</nav>' + renderConnectPanel();
+}
+
+</script>
+<script>
+
+
+const SEV_COLOR={critical:'#f43f5e',high:'#f59e0b',medium:'#4a7cff',low:'#22d3a0'};
+const SEV_BG={critical:'rgba(244,63,94,.1)',high:'rgba(245,158,11,.1)',medium:'rgba(74,124,255,.1)',low:'rgba(34,211,160,.08)'};
+const STRAT_C={PE:'#4a7cff',CREDIT:'#22d3a0',COMMODITIES:'#f59e0b',RE:'#a78bfa'};
+const STRAT_L={PE:'Private Equity',CREDIT:'Private Credit',COMMODITIES:'Commodities',RE:'Real Estate'};
+
+let allReviews=[];
+let filterQ='';
+let filterStrat='all';
+let expandedKey=null;
+let expandTab='summary';
+
+function toast(msg,col){const t=document.getElementById('toasts');const d=document.createElement('div');d.className='toast';if(col)d.style.borderLeftColor=col;d.textContent=msg;t.appendChild(d);setTimeout(()=>d.remove(),3500);}
+function tag(label,c='#4a7cff'){return `<span class="tag" style="background:${c}18;color:${c};border:1px solid ${c}44">${label}</span>`;}
+
+// ── Seed data from demo docs (always shown) ────────────────────────────────────
+const SEED=[
+  {key:'seed_acme',savedAt:'2024-11-02T09:14:00Z',strategy:'PE',companyName:'Acme Manufacturing SA',submitterName:'Demo',source:'document',
+   analysis:{overall_risk_score:5,overall_risk_level:'medium',investment_recommendation:'proceed_with_caution',headline:'Strong growth profile with manageable concentration risk',summary:'Acme Manufacturing SA demonstrates strong operational execution with 22% revenue CAGR. The primary risk is customer concentration (top 3 = 62% revenue).',risk_flags:[{severity:'high',category:'commercial',title:'Customer concentration risk',detail:'Top 3 customers = 62% of FY2023 revenue.',mitigation:'Negotiate long-term supply agreements.'},{severity:'medium',category:'financial',title:'Receivables deterioration',detail:'DSO increased from 38 to 52 days YoY.',mitigation:'Review payment terms.'}],strengths:['22% revenue CAGR 2021-2023','EBITDA margin 15%→18%','Clean PwC audit','Low leverage D/E 0.43x'],diligence_gaps:['Management accounts Q3 2024','Customer contracts','Capex plan'],key_highlights:['Revenue grew 49% 2021-2023','Net debt/EBITDA 0.54x'],key_concerns:['Top 3 customers = 62%','Receivables days +14 YoY'],next_steps:['Q3 2024 management accounts','Customer contract schedule','Independent market study']}},
+  {key:'seed_lagos',savedAt:'2024-11-20T11:32:00Z',strategy:'RE',companyName:'LLH Properties Ltd',submitterName:'Demo',source:'document',
+   analysis:{overall_risk_score:4,overall_risk_level:'medium',investment_recommendation:'proceed_with_caution',headline:'Quality logistics asset — FX management required',summary:'Lagos Logistics Hub Grade-A facility with 85% pre-let multinational tenancy. Primary risks are FX exposure and FTZ regulatory dependency.',risk_flags:[{severity:'high',category:'market',title:'USD/NGN currency exposure',detail:'Asset priced in USD, rental income collected in NGN.',mitigation:'USD indexation in leases. FX hedging strategy.'},{severity:'medium',category:'compliance',title:'FTZ regulatory dependency',detail:'Asset value depends on Lagos FTZ operational status.',mitigation:'Legal DD on FTZ. Regulatory comfort letter.'}],strengths:['85% pre-leased to multinationals','Grade-A specification','5-year WALTs'],diligence_gaps:['Title search','Full tenancy review','Environmental assessment'],key_highlights:['85% pre-leased, 5-yr WALT','DHL and Maersk anchor tenants'],key_concerns:['USD/NGN FX exposure','FTZ dependency'],next_steps:['Title search','USD indexation clauses','FTZ comfort letter']}},
+  {key:'seed_microlend',savedAt:'2024-11-28T14:05:00Z',strategy:'PE',companyName:'MicroLend SA',submitterName:'Demo',source:'document',
+   analysis:{overall_risk_score:3,overall_risk_level:'low',investment_recommendation:'proceed',headline:'Sound legal structure — negotiate two provisions before signing',summary:'Well-drafted OHADA SHA. Two negotiable provisions: 12-month founder lock-up and quarterly information rights.',risk_flags:[{severity:'medium',category:'legal',title:'Short founder lock-up',detail:'12-month lock-up below 24-month market standard.',mitigation:'Negotiate extension to 24 months.'},{severity:'low',category:'legal',title:'Quarterly information rights',detail:'Standard is monthly management accounts.',mitigation:'Request amendment to Clause 8.2.'}],strengths:['Clean OHADA structure','Strong drag-along provisions','IP ownership clarity'],diligence_gaps:['Cap table vs registry','Side letters','BCEAO licence'],key_highlights:['Standard OHADA documentation','Strong exit provisions'],key_concerns:['12-month lock-up too short','Quarterly info rights'],next_steps:['Negotiate lock-up to 24 months','Upgrade to monthly info rights','Verify cap table']}},
+  {key:'seed_greenpower',savedAt:'2024-12-03T10:20:00Z',strategy:'PE',companyName:'GreenPower SN',submitterName:'Demo',source:'document',
+   analysis:{overall_risk_score:6,overall_risk_level:'high',investment_recommendation:'further_diligence_required',headline:'Attractive sector — execution risk requires staged investment',summary:'High execution risk. Projections optimistic, rely on management assumptions. Independent technical DD required.',risk_flags:[{severity:'high',category:'financial',title:'Single scenario model',detail:'No downside or upside scenarios. Industry standard requires three.',mitigation:'Request independent three-scenario model.'},{severity:'high',category:'operational',title:'Pipeline execution risk',detail:'100% completion assumed vs 40-60% typical attrition.',mitigation:'Tranched investment tied to MW commissioned milestones.'}],strengths:['70% EBITDA margins','Senegal renewable policy','15yr management experience'],diligence_gaps:['Independent technical assessment','Three-scenario model','PPA bankability'],key_highlights:['Senegal 30% renewable target','70% EBITDA at steady state'],key_concerns:['No downside scenario','40MW pipeline risk','Single SENELEC PPA'],next_steps:['Independent technical advisor','Three-scenario model','PPA review']}},
+  {key:'seed_bantupay',savedAt:'2024-12-08T13:45:00Z',strategy:'PE',companyName:'BantuPay Ltd',submitterName:'Demo',source:'document',
+   analysis:{overall_risk_score:6,overall_risk_level:'high',investment_recommendation:'further_diligence_required',headline:'Compelling fintech — high growth, high execution risk',summary:'BantuPay addresses a genuine market gap. Primary concerns: unaudited financials, team depth, competitive landscape.',risk_flags:[{severity:'high',category:'financial',title:'Projections unaudited',detail:'All financials are management-prepared.',mitigation:'Request reviewed financials.'},{severity:'high',category:'commercial',title:'Competitive intensity',detail:'Orange Money, Wave, MTN MoMo are entrenched incumbents.',mitigation:'Independent market study. Customer cohort data.'}],strengths:['68% target market unbanked','145% YoY revenue growth','Offline-capable architecture'],diligence_gaps:['Technical architecture review','Customer LTV and churn','Regulatory licences'],key_highlights:['68% unbanked target market','145% revenue growth FY2024'],key_concerns:['Unaudited financials','Technical key-man risk','Competition'],next_steps:['Technical DD','Regulatory licence check','Customer LTV analysis']}},
+  {key:'seed_sonidel',savedAt:'2024-12-10T09:00:00Z',strategy:'COMMODITIES',companyName:'Sonidel SARL',submitterName:'Demo',source:'document',
+   analysis:{overall_risk_score:3,overall_risk_level:'low',trade_recommendation:'proceed',headline:'Strong collateral — proceed with standard FX and quality controls',summary:'AFEX-certified Grade A+ cocoa warehouse receipts. High-quality liquid collateral. Standard trade controls sufficient.',risk_flags:[{severity:'medium',category:'fx',title:'CFA Franc / USD exposure',detail:'USD-priced commodity, XAF settlement.',mitigation:'Lock FX rate at trade initiation.'},{severity:'low',category:'quality',title:'Moisture approaching ceiling',detail:'12.8% moisture vs 13% ceiling.',mitigation:'Retest moisture at settlement.'}],strengths:['AFEX-certified Grade A+','Negotiable warehouse receipt','Liquid commodity'],diligence_gaps:['Insurance verification','Warehouse operator standing','Counterparty credit'],key_highlights:['480 MT Grade A+ cocoa','AFEX-certified warehouse'],key_concerns:['CFA/USD FX exposure','Moisture at 98% of ceiling'],next_steps:['Lock FX rate','Quality retest clause','Verify warehouse insurance']}}
+];
+
+async function loadReviews(){
+  // 1. Get from localStorage (includes intake submissions)
+  var fromStorage = getAllReviewsLocal();
+  // 2. Get from Electron IPC
+  if(window.ddEngine&&window.ddEngine.loadReviews){
+    try{
+      var ipc = await window.ddEngine.loadReviews();
+      if(ipc&&ipc.length){
+        var sk=new Set(fromStorage.map(function(r){return r.key;}));
+        ipc.forEach(function(r){if(!sk.has(r.key))fromStorage.push(r);});
+      }
+    }catch(e){}
+  }
+  // 3. Merge with SEED (seed never shown if same key in storage)
+  var storageKeys=new Set(fromStorage.map(function(r){return r.key;}));
+  var seeds=SEED.filter(function(s){return !storageKeys.has(s.key);});
+  allReviews=[...fromStorage,...seeds].sort(function(a,b){return new Date(b.savedAt||0)-new Date(a.savedAt||0);});
+  renderAll();
+}
+
+function filterReviews(q){filterQ=q.toLowerCase();renderAll();}
+function setStratFilter(s){filterStrat=s;renderAll();}
+
+function getFiltered(){
+  return allReviews.filter(r=>{
+    const strat=(r.strategy||'').toUpperCase();
+    if(filterStrat!=='all'&&strat!==filterStrat)return false;
+    if(!filterQ)return true;
+    const search=[r.companyName||'',r.submitterName||'',(r.formData?.email||''),(r.strategy||''),r.s3Key||r.key,(r.analysis?.headline||'')].join(' ').toLowerCase();
+    return search.includes(filterQ);
+  });
+}
+
+function renderAll(){renderStats();renderFilters();renderBody();}
+
+function renderStats(){
+  const el=document.getElementById('stats-bar');
+  const total=allReviews.length;
+  const byStrat={};allReviews.forEach(r=>{const s=(r.strategy||'other').toUpperCase();byStrat[s]=(byStrat[s]||0)+1;});
+  const avgScore=total?Math.round(allReviews.reduce((a,r)=>a+(r.analysis?.overall_risk_score||0),0)/total):0;
+  const critical=allReviews.filter(r=>(r.analysis?.overall_risk_level||'')==='critical').length;
+  const thisMonth=allReviews.filter(r=>{const d=new Date(r.savedAt||0);const n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();}).length;
+  el.innerHTML=`<div class="stats-bar">
+    <div class="stat-box"><div class="stat-lbl">Total DDs</div><div class="stat-val">${total}</div></div>
+    <div class="stat-box"><div class="stat-lbl">Avg risk score</div><div class="stat-val" style="color:${avgScore>=7?'#f43f5e':avgScore>=5?'#f59e0b':'#22d3a0'}">${avgScore||'—'}</div></div>
+    <div class="stat-box"><div class="stat-lbl">Critical flags</div><div class="stat-val" style="color:${critical?'#f43f5e':'#22d3a0'}">${critical}</div></div>
+    <div class="stat-box"><div class="stat-lbl">This month</div><div class="stat-val">${thisMonth}</div></div>
+    <div class="stat-box"><div class="stat-lbl">Strategies</div><div class="stat-val">${Object.keys(byStrat).length}</div></div>
+  </div>`;
+}
+
+function renderFilters(){
+  const el=document.getElementById('filter-row');
+  const strats=[...new Set(allReviews.map(r=>(r.strategy||'other').toUpperCase()))].sort();
+  const pills=[{k:'all',l:'All'},...strats.map(s=>({k:s,l:STRAT_L[s]||s}))];
+  el.innerHTML=`<span style="font-size:11px;color:var(--muted);margin-right:4px">Filter:</span>`+
+    pills.map(p=>`<button class="fpill ${filterStrat===p.k?'active':''}" onclick="setStratFilter('${p.k}')">${p.l} <span style="opacity:.6">(${p.k==='all'?allReviews.length:allReviews.filter(r=>(r.strategy||'other').toUpperCase()===p.k).length})</span></button>`).join('');
+}
+
+function renderBody(){
+  const el=document.getElementById('reviews-body');
+  const filtered=getFiltered();
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty-state">
+      <div style="font-size:36px;margin-bottom:12px;opacity:.3">&#128196;</div>
+      <div style="font-weight:600;margin-bottom:6px">${allReviews.length?'No results for "'+filterQ+'"':'No DD reviews yet'}</div>
+      <div style="font-size:12px"><a href="intake.html" style="color:var(--blue)">Submit a new intake</a> to generate the first review</div>
+    </div>`;return;
+  }
+  const groups={};
+  filtered.forEach(r=>{const s=(r.strategy||'other').toUpperCase();if(!groups[s])groups[s]=[];groups[s].push(r);});
+  let html='';
+  ['PE','CREDIT','COMMODITIES','RE','OTHER'].filter(s=>groups[s]?.length).forEach(s=>{
+    const ac=STRAT_C[s]||'#5a6787';
+    const label=STRAT_L[s]||s;
+    html+=`<div class="sec-hdr"><span class="sec-dot" style="background:${ac}"></span><span class="sec-label">${label}</span><span class="sec-count">${groups[s].length} review${groups[s].length!==1?'s':''}</span></div>
+    <div class="rev-grid">${groups[s].map(r=>renderCard(r,ac)).join('')}</div>`;
+    const exp=groups[s].find(r=>r.key===expandedKey);
+    if(exp)html+=`<div class="rev-expand fu" id="exp-panel">${renderExpanded(exp)}</div>`;
+  });
+  el.innerHTML=html;
+}
+
+function renderCard(r,ac){
+  const a=r.analysis||{};
+  const sc=a.overall_risk_score||0;
+  const scc=sc>=8?'#f43f5e':sc>=6?'#f59e0b':sc>=4?'#fbbf24':'#22d3a0';
+  const rec=recLabel(a.investment_recommendation||a.trade_recommendation||a.credit_decision||'');
+  const recc=rec.toLowerCase().includes('reject')||rec.toLowerCase().includes('not')?'#f43f5e':rec.toLowerCase().includes('proceed')&&!rec.toLowerCase().includes('caution')?'#22d3a0':'#f59e0b';
+  const dt=r.savedAt?new Date(r.savedAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+  const isIntake=r.source==='intake'||!!(r.formData);
+  return `<div class="rev-card">
+    <div class="rev-card-top" style="border-left-color:${ac}" onclick="toggleExpand('${r.key.replace(/'/g,"\\'")}')">
+      <div class="rev-card-meta">
+        <div class="rev-card-co">${r.companyName||'Unnamed'}</div>
+        ${sc?`<div class="rev-score" style="color:${scc}">${sc}<span style="font-size:11px;opacity:.6">/10</span></div>`:''}
+      </div>
+      <div class="rev-submitter">${r.submitterName||''} ${r.formData?.email?'· '+r.formData.email:''} ${isIntake?'<span style="font-size:9px;padding:1px 5px;background:rgba(74,124,255,.1);color:var(--blue);border-radius:3px;border:1px solid rgba(74,124,255,.3)">intake</span>':''}</div>
+      ${a.headline?`<div class="rev-headline">${a.headline}</div>`:''}
+    </div>
+    <div class="rev-card-foot">
+      <span class="rev-foot-tag">&#128197; <b>${dt}</b></span>
+      ${rec?`<span class="rev-foot-tag" style="color:${recc};font-weight:600">${rec}</span>`:''}
+      <button onclick="event.stopPropagation();deleteReview('${r.key.replace(/'/g,"\\'")}','${(r.companyName||'').replace(/'/g,"\\'")}',${r.source==='document'?'true':'false'})" style="margin-left:auto;font-size:10px;padding:3px 8px;background:rgba(244,63,94,.08);color:var(--red);border:1px solid rgba(244,63,94,.2);border-radius:var(--r);cursor:pointer">Delete</button>
+    </div>
+  </div>`;
+}
+
+function toggleExpand(key){
+  expandedKey=expandedKey===key?null:key;
+  expandTab='summary';
+  renderBody();
+  if(expandedKey){setTimeout(()=>{const el=document.getElementById('exp-panel');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},60);}
+}
+function setExpTab(t){expandTab=t;const el=document.getElementById('exp-panel');if(el)el.innerHTML=renderExpanded(allReviews.find(r=>r.key===expandedKey));}
+
+function renderExpanded(r){
+  if(!r)return'';
+  const a=r.analysis||{};
+  const isCredit=r.formData?.strategy==='credit'||r.strategy?.toUpperCase()==='CREDIT';
+  const isComm=r.formData?.strategy==='commodities'||r.strategy?.toUpperCase()==='COMMODITIES';
+  const hasCommodityAnalysis=!!(a.financial?.commodity_analysis||a.commodity_analysis);
+  const tabs=['summary','risk_flags','diligence'];
+  if(isCredit)tabs.splice(2,0,'credit');
+  if(isComm||hasCommodityAnalysis)tabs.push('commodity');
+  tabs.push('details');
+  const tabLabel={summary:'Summary',risk_flags:'Risk Flags',credit:'Credit',diligence:'Diligence Gaps',commodity:'Commodity Analysis',details:'Details'};
+  let content='';
+  if(expandTab==='summary'){
+    const sc=a.overall_risk_score||0;const scc=sc>=8?'#f43f5e':sc>=6?'#f59e0b':sc>=4?'#fbbf24':'#22d3a0';
+    const rec=recLabel(a.investment_recommendation||a.trade_recommendation||a.credit_decision||'');
+    const recc=rec.toLowerCase().includes('reject')?'#f43f5e':rec.toLowerCase().includes('proceed')&&!rec.toLowerCase().includes('caution')?'#22d3a0':'#f59e0b';
+    content=`<div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:14px">
+      <div style="text-align:center;background:${scc}10;border:1px solid ${scc}33;border-radius:var(--rl);padding:14px 18px">
+        <div style="font-family:var(--ffm);font-size:36px;font-weight:700;color:${scc}">${sc}</div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Risk /10</div>
+        <div style="margin-top:8px">${tag(a.overall_risk_level||'',scc)}</div>
+        <div style="margin-top:6px"><span style="font-size:11px;font-weight:600;color:${recc}">${rec}</span></div>
+      </div>
+      <div>
+        ${a.headline?`<h3 style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.4">${a.headline}</h3>`:''}
+        <p style="font-size:12px;color:var(--muted);line-height:1.8">${a.summary||''}</p>
+        ${(a.strengths||[]).length?`<div style="margin-top:10px"><div class="exp-lbl">Strengths</div>${a.strengths.map(s=>`<div style="font-size:12px;color:var(--green);padding:3px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span>&#10003;</span>${s}</div>`).join('')}</div>`:''}
+        ${(a.key_highlights||[]).length?`<div style="margin-top:10px"><div class="exp-lbl">Key highlights</div>${a.key_highlights.map(h=>`<div style="font-size:12px;padding:3px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span style="color:var(--blue)">&#9679;</span>${h}</div>`).join('')}</div>`:''}
+        ${(a.key_concerns||[]).length?`<div style="margin-top:10px"><div class="exp-lbl">Key concerns</div>${a.key_concerns.map(c=>`<div style="font-size:12px;color:var(--amber);padding:3px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span>&#9650;</span>${c}</div>`).join('')}</div>`:''}
+        ${(a.next_steps||[]).length?`<div style="margin-top:10px"><div class="exp-lbl">Next steps</div>${a.next_steps.map((s,i)=>`<div style="font-size:12px;padding:3px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span style="color:var(--green)">${i+1}.</span>${s}</div>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  } else if(expandTab==='risk_flags'){
+    const flags=a.risk_flags||[];
+    content=flags.length?flags.map(f=>`<div style="padding:10px 12px;border-radius:var(--r);margin-bottom:7px;border-left:3px solid ${SEV_COLOR[f.severity]||'#888'};background:${SEV_BG[f.severity]||'var(--surf)'}">
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">${tag(f.severity,SEV_COLOR[f.severity]||'#888')}${tag(f.category,'#6b7599')}<strong style="font-size:12px">${f.title||''}</strong></div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.5">${f.detail||''}</p>
+      ${f.mitigation?`<div style="font-size:11px;color:var(--green);margin-top:4px">Mitigation: ${f.mitigation}</div>`:''}</div>`).join('')
+      :'<div style="color:var(--muted);font-size:13px">No risk flags recorded.</div>';
+  } else if(expandTab==='credit'){
+    const d=r.formData||{};
+    if(d.grd){const gr=d.grd;
+      content=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+        ${[['Grade',`G${gr.g} — ${gr.label}`,'var(--text)'],['Expected loss',(d.EL?.toFixed(2)||'—')+'%','#f43f5e'],['Structure',d.str||'—','var(--text)'],['Required rate',(d.req?.toFixed(2)||'—')+'%','var(--gold)']].map(([l,v,c])=>`<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px"><div class="exp-lbl">${l}</div><div style="font-family:var(--ffm);font-size:14px;font-weight:600;color:${c}">${v}</div></div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">
+        ${[['Base',(d.br?.toFixed(2)||'—')+'%','var(--muted)'],['EL',(d.EL?.toFixed(2)||'—')+'%','#f43f5e'],['Illiq.',(d.il?.toFixed(2)||'—')+'%','#f59e0b'],['Complex.',(d.cx?.toFixed(2)||'—')+'%','#a78bfa'],['Target','4.00%','#4a7cff'],['= Rate',(d.req?.toFixed(2)||'—')+'%','var(--gold)']].map(([l,v,c])=>`<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center"><div style="font-size:9px;color:var(--muted);margin-bottom:3px;text-transform:uppercase">${l}</div><div style="font-family:var(--ffm);font-size:13px;font-weight:600;color:${c}">${v}</div></div>`).join('')}
+      </div>
+      ${(a.covenant_recommendations||[]).length?`<div style="margin-top:12px"><div class="exp-lbl">Covenant recommendations</div>${a.covenant_recommendations.map(c=>`<div style="font-size:12px;color:var(--blue);padding:3px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span>&#9679;</span>${c}</div>`).join('')}</div>`:''}`;
+    }else{content='<div style="color:var(--muted);font-size:13px">Credit details available only for Private Credit submissions.</div>';}
+  } else if(expandTab==='diligence'){
+    const gaps=a.diligence_gaps||[];
+    content=gaps.length?`<div>${gaps.map(g=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--amber)"><span>&#9651;</span>${g}</div>`).join('')}</div>`:'<div style="color:var(--muted);font-size:13px">No diligence gaps recorded.</div>';
+  } else if(expandTab==='commodity'){
+    const ca=a.financial?.commodity_analysis||a.commodity_analysis||null;
+    const fd=r.formData||{};
+    if(ca){
+      content=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+        <div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px"><div class="exp-lbl">Submitted price</div><div style="font-family:var(--ffm);font-size:16px;font-weight:700;color:var(--blue)">$${ca.submitted_price}/MT</div></div>
+        <div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px"><div class="exp-lbl">Reference price</div><div style="font-family:var(--ffm);font-size:16px;font-weight:700;color:var(--amber)">$${ca.reference_price||'N/A'}/MT</div></div>
+        <div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px"><div class="exp-lbl">Price vs market</div><div style="font-family:var(--ffm);font-size:16px;font-weight:700;color:${(ca.price_delta_pct||0)>=0?'var(--green)':'var(--red)'}">${(ca.price_delta_pct||0)>=0?'+':''}${ca.price_delta_pct||0}%</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px">${ca.market_context||''}</p>
+      ${ca.exchange_comparison&&ca.exchange_comparison.length?`<div class="exp-lbl">Exchange comparison</div>
+        <table class="comm-table"><thead><tr><th>Exchange</th><th>Price (USD/MT)</th><th>Spread vs submitted</th><th>Liquidity</th></tr></thead><tbody>
+        ${ca.exchange_comparison.map(ex=>`<tr><td style="font-weight:600">${ex.exchange}</td><td style="font-family:var(--ffm)">$${ex.price}</td><td style="font-family:var(--ffm);color:${(parseFloat(ex.spread)||0)>=0?'var(--green)':'var(--red)'}">${ex.spread}</td><td>${tag(ex.liquidity,ex.liquidity==='High'?'#22d3a0':ex.liquidity==='Medium'?'#f59e0b':'#5a6787')}</td></tr>`).join('')}
+        </tbody></table>`:''}
+      ${ca.viability_factors&&ca.viability_factors.length?`<div style="margin-top:12px"><div class="exp-lbl">Viability assessment</div>
+        ${ca.viability_factors.map(f=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:${f.ok?'var(--green)':'var(--red)'};font-size:14px">${f.ok?'&#10003;':'&#10005;'}</span><span style="flex:1">${f.label}</span><span style="color:var(--muted);font-size:11px">${f.value}</span></div>`).join('')}</div>`:''}
+      <div style="margin-top:12px;padding:10px;background:var(--surf2);border-radius:var(--r);font-size:12px;line-height:1.7">${ca.viability_verdict||''}</div>`;
+    } else if(fd.commodity){
+      content=`<div style="color:var(--muted);font-size:12px;line-height:1.8">
+        <b>Commodity:</b> ${fd.commodity} | <b>Exchange:</b> ${fd.exchange||'—'} | <b>Volume:</b> ${fd.volume||'—'} MT | <b>Price:</b> $${fd.price||'—'}/MT<br>
+        <b>Grade:</b> ${fd.grade||'—'} | <b>Counterparty:</b> ${fd.counterparty||'—'}<br>
+        <span style="color:var(--amber)">Run Full Analysis on the document to generate commodity market comparison.</span>
+      </div>`;
+    } else {content='<div style="color:var(--muted);font-size:13px">No commodity data available.</div>';}
+  } else if(expandTab==='details'){
+    const fd=r.formData||{};
+    const rows=Object.entries(fd).filter(([k,v])=>v&&!['strategy','submittedAt','grd','docB64'].includes(k)&&typeof v!=='object');
+    content=`<div style="display:grid;gap:2px">
+      ${rows.map(([k,v])=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:160px 1fr;gap:8px;font-size:12px"><div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;align-self:center">${k.replace(/_/g,' ')}</div><div>${v}</div></div>`).join('')}
+      <div style="padding:8px 0;font-size:11px;color:var(--muted)">Key: <span style="font-family:var(--ffm);color:var(--gold);word-break:break-all">${r.s3Key||r.key}</span></div>
+    </div>`;
+  }
+
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-weight:700;font-size:14px">${r.companyName||'DD Review'} <span style="font-size:11px;color:var(--muted);font-weight:400">&mdash; ${(r.strategy||'').toUpperCase()}</span></div>
+    <button onclick="expandedKey=null;renderBody()" style="font-size:18px;color:var(--muted);cursor:pointer;background:none;border:none;line-height:1">&#10005;</button>
+  </div>
+  <div class="exp-tabs">${tabs.map(t=>`<button class="exp-tab ${expandTab===t?'active':''}" onclick="setExpTab('${t}')">${tabLabel[t]||t}</button>`).join('')}</div>
+  ${content}`;
+}
+
+async function deleteReview(key,name,isSeed){
+  if(isSeed){toast('Demo reviews cannot be deleted.','#f59e0b');return;}
+  if(!confirm(`Delete DD review for "${name}"?\n\nThe analysis is removed from storage.`))return;
+  await deleteReviewByKey(key);
+  allReviews=allReviews.filter(r=>r.key!==key);
+  if(expandedKey===key)expandedKey=null;
+  toast('Deleted: '+name,'#f43f5e');
+  renderAll();
+}
+
+
+
+// ── Auto-refresh: check every 5s for new intake submissions ──────────────────
+setInterval(function(){
+  var fromStorage = getAllReviewsLocal();
+  var storageKeys = new Set(fromStorage.map(function(r){return r.key;}));
+  var seeds = SEED.filter(function(s){return !storageKeys.has(s.key);});
+  var next = fromStorage.concat(seeds).sort(function(a,b){return new Date(b.savedAt||0)-new Date(a.savedAt||0);});
+  if(next.length !== allReviews.length){
+    allReviews = next;
+    renderAll();
+  }
+}, 5000);
+
+// ── Init (runs after DOM is parsed) ──────────────────────────────────────────
+(function init(){
+  try {
+    var ph = document.getElementById('nav-placeholder');
+    if (ph) ph.outerHTML = renderNav('reviews.html');
+    applyTheme(CUR_THEME);
+    applyLang(CUR_LANG);
+    updateConnectUI();
+    loadReviews();
+  } catch(e) {
+    console.error('Reviews init error:', e);
+    var wrap = document.getElementById('wrap');
+    if (wrap) wrap.innerHTML = '<div style="color:#f04166;padding:20px;font-family:monospace;font-size:12px">Init error: ' + e.message + '</div>';
+  }
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com blob:; object-src 'none'">
+<title>AutoOps &mdash; Prime Alpha Securities</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>:root{--bg:#07090f;--surf:#0d1119;--surf2:#121722;--surf3:#171e2d;--border:#1a2238;--border2:#1f2d47;--blue:#4a7cff;--blue-d:rgba(74,124,255,.1);--green:#1fc98a;--red:#f04166;--amber:#f59e0b;--gold:#c9a84c;--purple:#a78bfa;--text:#dde4f5;--muted:#566382;--dim:#1c2540;--ff:'Figtree',system-ui,sans-serif;--ffm:'DM Mono',monospace;--r:6px;--rl:10px;}
+html[data-theme="light"]{--bg:#f0f2f7;--surf:#ffffff;--surf2:#f4f6fb;--surf3:#edf0f8;--border:#dde1ed;--border2:#c5cbe0;--blue:#2563eb;--blue-d:rgba(37,99,235,.1);--green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b45309;--purple:#7c3aed;--text:#0f172a;--muted:#64748b;--dim:#e2e8f0;}
+html[data-theme="light"] body{color-scheme:light}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit;color:inherit}
+input,select,textarea{font-family:var(--ff);color:var(--text);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;outline:none;font-size:13px;transition:border .12s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.btn-p{background:var(--blue);color:#fff;padding:8px 16px;border-radius:var(--r);font-size:12px;font-weight:700;border:none;cursor:pointer}
+.btn-p:hover{opacity:.88}
+.btn-g{background:var(--surf2);color:var(--muted);border:1px solid var(--border);padding:7px 14px;border-radius:var(--r);font-size:12px;cursor:pointer}
+.app-shell{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:220px;min-width:220px;background:var(--surf);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .22s ease,min-width .22s ease;flex-shrink:0}
+#sidebar.collapsed{width:52px;min-width:52px}
+#sidebar.collapsed .nav-label{display:none}
+#sidebar.collapsed .nav-link{justify-content:center;padding:10px 0}
+#sidebar.collapsed .sidebar-header .sb-title{display:none}
+.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-title{font-family:var(--ffm);font-size:11px;font-weight:500;color:var(--green);letter-spacing:.15em;text-transform:uppercase;white-space:nowrap}
+.sb-toggle{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;border-radius:var(--r)}
+.sb-toggle:hover{color:var(--text);background:var(--surf2)}
+.nav-section{flex:1;overflow-y:auto;padding:8px 0}
+.nav-link{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:13px;color:var(--muted);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all .12s;white-space:nowrap;font-family:inherit}
+.nav-link:hover{color:var(--text);background:var(--surf2)}
+.nav-link.active{color:var(--green);background:rgba(31,201,138,.08);font-weight:600}
+.nav-icon{width:20px;text-align:center;flex-shrink:0;font-size:14px}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);flex-shrink:0}
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;background:var(--surf);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;position:relative}
+.topbar-title{flex:1;font-size:14px;font-weight:600}
+.main-content{flex:1;overflow-y:auto;padding:24px;min-height:0}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:12px}
+.page-header{margin-bottom:22px}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{font-size:12px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px}
+.stat-card.blue{border-top:3px solid var(--blue)}
+.stat-card.green{border-top:3px solid var(--green)}
+.stat-card.amber{border-top:3px solid var(--amber)}
+.stat-card.red{border-top:3px solid var(--red)}
+.stat-card.purple{border-top:3px solid var(--purple)}
+.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:700;margin-bottom:2px}
+.stat-sub{font-size:11px;color:var(--muted)}
+.connect-panel{position:absolute;top:51px;right:16px;width:360px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);padding:18px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9000}
+.cp-lbl{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.cp-input{font-family:var(--ffm);font-size:12px;width:100%;padding:7px 10px;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);color:var(--text)}
+.cp-save{background:var(--blue);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12px;font-weight:600;border:none;cursor:pointer}
+.cp-cancel{background:var(--surf2);color:var(--muted);border:1px solid var(--border);padding:6px 12px;border-radius:var(--r);font-size:12px;cursor:pointer}
+.cp-clear{background:rgba(240,65,102,.08);color:var(--red);border:1px solid rgba(240,65,102,.2);padding:6px 12px;border-radius:var(--r);font-size:12px;cursor:pointer;margin-left:auto}
+.connect-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);font-size:12px;color:var(--muted);cursor:pointer}
+.connect-btn.connected{border-color:var(--green);color:var(--green)}
+.connect-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.connect-dot.on{background:var(--green)}
+.profile-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.profile-dropdown{position:absolute;top:51px;right:16px;width:270px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rl);box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9000}
+.profile-page{position:fixed;inset:0;background:var(--bg);z-index:8000;overflow-y:auto;display:none}
+.profile-page.open{display:block}
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--surf);border-left:3px solid var(--green);padding:9px 14px;border-radius:var(--r);font-size:12px;border:1px solid rgba(31,201,138,.25);max-width:340px}
+.pg-footer{padding:10px 20px;border-top:1px solid rgba(201,168,76,.1);text-align:center;font-size:11px;color:var(--muted);flex-shrink:0}
+.pg-footer span{color:#c9a84c;font-weight:700;letter-spacing:.1em;text-transform:uppercase}</style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <span class="sb-title">AutoOps</span>
+      <button class="sb-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
+    </div>
+    <nav class="nav-section">
+      <button class="nav-link" data-tab="dashboard" onclick="setTab('dashboard')"><span class="nav-icon">⬡</span><span class="nav-label">Dashboard</span></button>
+<button class="nav-link" data-tab="documents" onclick="setTab('documents')"><span class="nav-icon">◧</span><span class="nav-label">Document Processor</span></button>
+<button class="nav-link" data-tab="kyc" onclick="setTab('kyc')"><span class="nav-icon">👤</span><span class="nav-label">KYC / AML</span></button>
+<button class="nav-link" data-tab="compliance" onclick="setTab('compliance')"><span class="nav-icon">⚖</span><span class="nav-label">Compliance</span></button>
+<button class="nav-link" data-tab="transactions" onclick="setTab('transactions')"><span class="nav-icon">◈</span><span class="nav-label">Transactions</span></button>
+<button class="nav-link" data-tab="pipelines" onclick="setTab('pipelines')"><span class="nav-icon">⚙</span><span class="nav-label">Pipelines</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 2px" onclick="openProfilePage()">
+        <div style="width:32px;height:32px;border-radius:50%;background:#4a7cff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">JB</div>
+        <div class="nav-label">
+          <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Johan Botouli</div>
+          <div style="font-size:10px;color:var(--muted)">CTO</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-title">Prime Alpha Securities</div>
+      <div class="connect-btn" onclick="toggleConnect()">
+        <span class="connect-dot" id="connect-dot"></span>
+        <span id="connect-label">Connect</span>
+        <span style="font-size:10px;opacity:.6">&#9660;</span>
+      </div>
+      <button id="theme-btn" onclick="toggleTheme()" style="padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);font-size:11px;color:var(--muted)">&#9728; Light</button>
+      <button id="lang-btn" onclick="toggleLang()" style="padding:5px 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surf2);font-size:11px;color:var(--muted)">&#127467;&#127479; FR</button>
+      <div id="nav-avatar" class="profile-avatar" onclick="toggleProfileDropdown()" style="background:#4a7cff;color:#fff">JB</div>
+    </div>
+
+    <div class="connect-panel" id="connect-panel" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:13px;font-weight:700">Connections</div><button onclick="toggleConnect()" style="font-size:16px;color:var(--muted);background:none;border:none">&#10005;</button></div>
+      <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px">Connect to DD Engine and AlphaCore for live data sync.</p>
+      <div style="margin-bottom:8px"><label class="cp-lbl">DD Engine URL</label><input id="cp-dd-url" placeholder="http://localhost:8081" class="cp-input"></div>
+      <div style="margin-bottom:8px"><label class="cp-lbl">AlphaCore URL</label><input id="cp-ac-url" placeholder="http://localhost:8080" class="cp-input"></div>
+      <div style="margin-bottom:8px"><label class="cp-lbl">AutoOps URL (self)</label><input id="cp-ao-url" placeholder="http://localhost:8082" class="cp-input"></div>
+      <div style="margin-bottom:8px"><label class="cp-lbl">Anthropic API key</label><input id="cp-anthropic" type="password" placeholder="sk-ant-..." class="cp-input"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="cp-save" onclick="saveConnect()">Save &amp; connect</button>
+        <button class="cp-cancel" onclick="toggleConnect()">Cancel</button>
+        <button class="cp-clear" onclick="clearConnect()">Disconnect</button>
+      </div>
+      <div id="cp-status" style="font-size:11px;margin-top:8px"></div>
+    </div>
+
+    <div id="profile-dropdown" class="profile-dropdown" style="display:none">
+      <div style="padding:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#4a7cff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff">JB</div>
+        <div><div style="font-size:13px;font-weight:600">Johan Botouli</div><div style="font-size:11px;color:var(--muted)">Chief Technology Officer</div></div>
+      </div>
+      <div style="padding:6px">
+        <button onclick="openProfilePage()" style="width:100%;text-align:left;padding:8px 12px;border-radius:var(--r);font-size:12px;color:var(--text);cursor:pointer;border:none;background:none">&#128100; View profile</button>
+        <button onclick="toggleTheme()" style="width:100%;text-align:left;padding:8px 12px;border-radius:var(--r);font-size:12px;color:var(--text);cursor:pointer;border:none;background:none">&#9728; Toggle theme</button>
+        <button onclick="toggleLang()" style="width:100%;text-align:left;padding:8px 12px;border-radius:var(--r);font-size:12px;color:var(--text);cursor:pointer;border:none;background:none">&#127467;&#127479; Language</button>
+      </div>
+    </div>
+
+    <div class="main-content" id="main-content"></div>
+    <div class="pg-footer"><span>Prime Alpha Securities</span> &nbsp;&middot;&nbsp; AutoOps Platform &nbsp;&middot;&nbsp; Confidential</div>
+  </div>
+</div>
+
+<div id="profile-page" class="profile-page"></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// AutoOps — Initiative 13/15 — Operational Automation Platform
+
+// ── Theme / Lang ────────────────────────────────────────────────────────────
+let CUR_THEME = localStorage.getItem('dd_theme')||'dark';
+let CUR_LANG  = localStorage.getItem('dd_lang')||'en';
+function applyTheme(t){
+  CUR_THEME=t;
+  let el=document.getElementById('__tv__');
+  if(!el){el=document.createElement('style');el.id='__tv__';document.head.appendChild(el);}
+  if(t==='light'){
+    document.documentElement.setAttribute('data-theme','light');
+    el.textContent=':root{--bg:#f0f2f7!important;--surf:#ffffff!important;--surf2:#f4f6fb!important;--surf3:#edf0f8!important;--border:#dde1ed!important;--text:#0f172a!important;--muted:#64748b!important;--blue:#2563eb!important;--blue-d:rgba(37,99,235,.1)!important;--green:#16a34a!important;--red:#dc2626!important;--amber:#d97706!important;--purple:#7c3aed!important;--dim:#e2e8f0!important;}';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    el.textContent='';
+  }
+  localStorage.setItem('dd_theme',t);
+  const btn=document.getElementById('theme-btn');
+  if(btn)btn.textContent=t==='dark'?'☀ Light':'◑ Dark';
+}
+function toggleTheme(){applyTheme(CUR_THEME==='dark'?'light':'dark');}
+function applyLang(l){CUR_LANG=l;localStorage.setItem('dd_lang',l);const btn=document.getElementById('lang-btn');if(btn)btn.textContent=l==='en'?'🇫🇷 FR':'🇬🇧 EN';}
+function toggleLang(){applyLang(CUR_LANG==='en'?'fr':'en');}
+
+// ── Connection ──────────────────────────────────────────────────────────────
+let DD_CONN={};
+try{DD_CONN=JSON.parse(localStorage.getItem('dd_connection')||'{}');}catch(e){}
+function updateConnectUI(){
+  const connected=!!(DD_CONN.anthropicKey||DD_CONN.alphacore||DD_CONN.autoops);
+  const dot=document.getElementById('connect-dot');
+  const lbl=document.getElementById('connect-label');
+  const cbtn=document.querySelector('.connect-btn');
+  if(dot)dot.classList.toggle('on',connected);
+  if(lbl)lbl.textContent=connected?'Connected':'Connect';
+  if(cbtn)cbtn.classList.toggle('connected',connected);
+  const fm={'cp-anthropic':DD_CONN.anthropicKey,'cp-ac-url':DD_CONN.alphacore,'cp-dd-url':DD_CONN.ddengine,'cp-ao-url':DD_CONN.autoops};
+  Object.keys(fm).forEach(id=>{const el=document.getElementById(id);if(el&&fm[id])el.value=fm[id];});
+}
+function toggleConnect(){const p=document.getElementById('connect-panel');if(!p)return;const open=p.style.display==='none'||!p.style.display;p.style.display=open?'block':'none';if(open)updateConnectUI();}
+function saveConnect(){
+  const ak=document.getElementById('cp-anthropic')?.value?.trim()||'';
+  const ac=document.getElementById('cp-ac-url')?.value?.trim()||'';
+  const dd=document.getElementById('cp-dd-url')?.value?.trim()||'';
+  const ao=document.getElementById('cp-ao-url')?.value?.trim()||'';
+  DD_CONN={anthropicKey:ak,alphacore:ac,ddengine:dd,autoops:ao};
+  localStorage.setItem('dd_connection',JSON.stringify(DD_CONN));
+  updateConnectUI();
+  const st=document.getElementById('cp-status');if(st)st.innerHTML='<span style="color:var(--green)">✓ Saved</span>';
+  setTimeout(()=>{const p=document.getElementById('connect-panel');if(p)p.style.display='none';},1400);
+}
+function clearConnect(){DD_CONN={};localStorage.removeItem('dd_connection');updateConnectUI();}
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg,col){
+  const wrap=document.getElementById('toasts');if(!wrap)return;
+  const d=document.createElement('div');d.className='toast';
+  d.style.borderLeftColor=col||'var(--green)';d.textContent=msg;
+  wrap.appendChild(d);setTimeout(()=>d.remove(),3500);
+}
+function tag(label,c){c=c||'#4a7cff';return`<span class="tag" style="background:${c}18;color:${c};border:1px solid ${c}44">${label}</span>`;}
+
+// ── Sidebar ──────────────────────────────────────────────────────────────────
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');if(!sb)return;
+  sb.classList.toggle('collapsed');
+  localStorage.setItem('ao_sidebar',sb.classList.contains('collapsed')?'1':'0');
+}
+function initSidebar(){
+  const sb=document.getElementById('sidebar');if(!sb)return;
+  if(localStorage.getItem('ao_sidebar')==='1')sb.classList.add('collapsed');
+}
+
+// ── Profile ──────────────────────────────────────────────────────────────────
+const CURRENT_USER_AO={name:'Johan Botouli',email:'aurel.botouli@primealphasecurities.com',role:'Chief Technology Officer',initials:'JB',color:'#4a7cff',ic_member:true,joined:'2024-06-01'};
+let _profileOpen=false;
+function toggleProfileDropdown(){
+  _profileOpen=!_profileOpen;
+  const pd=document.getElementById('profile-dropdown');
+  if(pd)pd.style.display=_profileOpen?'block':'none';
+}
+function openProfilePage(){
+  _profileOpen=false;
+  const pd=document.getElementById('profile-dropdown');if(pd)pd.style.display='none';
+  const pp=document.getElementById('profile-page');if(pp){pp.classList.add('open');renderProfilePageAO();}
+}
+function closeProfilePage(){const pp=document.getElementById('profile-page');if(pp)pp.classList.remove('open');}
+function renderProfilePageAO(){
+  const pp=document.getElementById('profile-page');if(!pp)return;
+  const u=CURRENT_USER_AO;
+  pp.innerHTML=`
+    <div style="max-width:700px;margin:0 auto;padding:40px 24px">
+      <button onclick="closeProfilePage()" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surf);margin-bottom:28px">&#8592; Back</button>
+      <div style="display:flex;align-items:center;gap:20px;margin-bottom:32px">
+        <div style="width:80px;height:80px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0">${u.initials}</div>
+        <div>
+          <div style="font-size:24px;font-weight:700;margin-bottom:4px">${u.name}</div>
+          <div style="font-size:13px;color:var(--muted)">${u.role}</div>
+          <div style="font-size:12px;color:var(--blue);margin-top:2px">${u.email}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
+        ${[['Role',u.role],['IC Member',u.ic_member?'Yes':'No'],['Joined',u.joined],['Platform','AutoOps'],['Firm','Prime Alpha Securities'],['Region','CEMAC / West Africa']].map(([l,v])=>`
+          <div style="background:var(--surf);border:1px solid var(--border);border-radius:6px;padding:12px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:3px">${l}</div>
+            <div style="font-size:13px;font-weight:600">${v}</div>
+          </div>`).join('')}
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:14px">Appearance</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="applyTheme('dark')" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--surf2);color:var(--text);cursor:pointer;font-size:12px">&#9790; Dark</button>
+          <button onclick="applyTheme('light')" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--surf2);color:var(--text);cursor:pointer;font-size:12px">&#9728; Light</button>
+        </div>
+      </div>
+      <div style="text-align:center;padding-top:12px;font-size:11px;color:var(--muted)"><span style="color:#c9a84c;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Prime Alpha Securities</span> &middot; AutoOps &middot; Confidential</div>
+    </div>`;
+}
+
+// ── Data ─────────────────────────────────────────────────────────────────────
+let kycRecords=[
+  {id:'kyc1',name:'Fatou Ndiaye',type:'individual',country:'Senegal',status:'approved',risk:'low',pep:false,sanctions:true,screened:'2024-12-01',docs_complete:true,source:'manual',notes:'LP investor — cleared',flags:[]},
+  {id:'kyc2',name:'Lagos Logistics Hub Ltd',type:'corporate',country:'Nigeria',status:'flagged',risk:'high',pep:false,sanctions:true,screened:'2024-11-28',docs_complete:false,source:'manual',notes:'Incomplete docs; high-risk flag',flags:['INCOMPLETE_DOCS','HIGH_RISK_JURISDICTION']},
+  {id:'kyc3',name:'CameroCacao SARL',type:'corporate',country:'Cameroon',status:'approved',risk:'low',pep:false,sanctions:true,screened:'2024-11-25',docs_complete:true,source:'manual',notes:'Trade counterparty — cleared',flags:[]},
+  {id:'kyc4',name:'Ali Hassan Investment LLC',type:'corporate',country:'UAE',status:'under_review',risk:'high',pep:false,sanctions:false,screened:'2024-11-15',docs_complete:false,source:'manual',notes:'UAE flagged as high-risk',flags:['HIGH_RISK_JURISDICTION']},
+];
+
+let transactions=[];
+function loadTransactionsFromStorage(){
+  try{
+    const stored=JSON.parse(localStorage.getItem('ao_transactions')||'[]');
+    if(stored.length) transactions=stored;
+    else transactions=[
+      {date:'2024-12-01',desc:'Capital call receipt — GreenPower SN Round 2',amount:500000,type:'capital_call',status:'posted',auto:true,currency:'USD'},
+      {date:'2024-11-28',desc:'Management fee Q4 2024 — PAS Mgmt Co',amount:-38400,type:'management_fee',status:'reconciled',auto:true,currency:'USD'},
+      {date:'2024-11-25',desc:'Distribution — CameroCacao trade profit',amount:87600,type:'distribution',status:'posted',auto:true,currency:'USD'},
+      {date:'2024-11-20',desc:'Wire transfer — Acme Manufacturing debt tranche',amount:-250000,type:'investment',status:'reconciled',auto:true,currency:'USD'},
+      {date:'2024-11-15',desc:'Capital call receipt — Douala Warehouse SPV',amount:350000,type:'capital_call',status:'posted',auto:true,currency:'USD'},
+    ];
+  }catch(e){transactions=[];}
+}
+
+let runLog=[
+  {module:'kyc',task:'screen_record',status:'success',summary:'Fatou Ndiaye: low risk, 0 flags',duration:1240,records:1,time:'2 min ago'},
+  {module:'compliance',task:'run_watchlist_screen',status:'success',summary:'Screened 12 entries, 0 alerts generated',duration:8340,records:12,time:'15 min ago'},
+  {module:'pipeline',task:'run_pipeline',status:'success',summary:"Pipeline 'Alpha Vantage Market Data' ran successfully",duration:3120,records:145,time:'1h ago'},
+  {module:'transaction',task:'reconcile',status:'warning',summary:'3 transactions require manual review',duration:2100,records:3,time:'2h ago'},
+  {module:'kyc',task:'batch_screen',status:'error',summary:'Batch screening failed: timeout on OFAC API',duration:45000,records:0,time:'4h ago'},
+];
+
+let alerts=[
+  {type:'INCOMPLETE_KYC',severity:'medium',entity:'Lagos Logistics Hub Ltd',title:'Incomplete KYC',detail:'Missing: proof of address, source of funds',status:'open',created:'2024-11-28'},
+  {type:'HIGH_RISK_JURISDICTION',severity:'high',entity:'Ali Hassan Investment LLC',title:'High-risk jurisdiction: UAE',detail:'UAE flagged as high-risk jurisdiction',status:'open',created:'2024-11-15'},
+  {type:'EXPIRED_DOCUMENT',severity:'low',entity:'CameroCacao SARL',title:'Document expiring',detail:'Business registration expires in 30 days',status:'open',created:'2024-12-01'},
+];
+
+let documents_ao=[
+  {id:'d1',name:'Fatou Ndiaye — Passport.pdf',type:'id_document',entity:'Fatou Ndiaye',uploaded:'2024-12-01',size:'1.2 MB',status:'verified',b64:null,mime:'application/pdf'},
+  {id:'d2',name:'Lagos Logistics Hub — Certificate of Incorporation.pdf',type:'company_doc',entity:'Lagos Logistics Hub Ltd',uploaded:'2024-11-28',size:'890 KB',status:'pending',b64:null,mime:'application/pdf'},
+  {id:'d3',name:'CameroCacao SARL — Business Registration.pdf',type:'company_doc',entity:'CameroCacao SARL',uploaded:'2024-11-25',size:'1.1 MB',status:'verified',b64:null,mime:'application/pdf'},
+  {id:'d4',name:'GreenPower SN — Source of Funds Declaration.pdf',type:'sof_declaration',entity:'GreenPower Senegal',uploaded:'2024-12-03',size:'450 KB',status:'pending',b64:null,mime:'application/pdf'},
+];
+
+// KYC Pipeline stages
+const KYC_STAGES=['submitted','extracting','screening','risk_scoring','compliance_review','decision'];
+const KYC_STAGE_LBL={'submitted':'Submitted','extracting':'Document Extraction','screening':'Sanctions Screening','risk_scoring':'Risk Scoring','compliance_review':'Compliance Review','decision':'Decision'};
+const KYC_STAGE_COLOR={'submitted':'#566382','extracting':'#4a7cff','screening':'#f59e0b','risk_scoring':'#a78bfa','compliance_review':'#f04166','decision':'#1fc98a'};
+const RISK_COLOR={low:'#1fc98a',medium:'#f59e0b',high:'#f04166',critical:'#dc143c'};
+const STATUS_COLOR={approved:'#1fc98a',flagged:'#f04166',under_review:'#f59e0b',submitted:'#566382',pending_screening:'#4a7cff',rejected:'#dc143c'};
+
+// ── State ────────────────────────────────────────────────────────────────────
+let state={tab:'dashboard',kycTab:'queue',selectedKYC:null,txFilter:'all',docFilter:'all'};
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function setTab(t){state.tab=t;render();}
+function render(){
+  const main=document.getElementById('main-content');if(!main)return;
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.tab===state.tab));
+  switch(state.tab){
+    case 'dashboard':   main.innerHTML=renderDashboard();break;
+    case 'documents':   main.innerHTML=renderDocuments();break;
+    case 'kyc':         main.innerHTML=renderKYC();break;
+    case 'compliance':  main.innerHTML=renderCompliance();break;
+    case 'transactions':main.innerHTML=renderTransactions();break;
+    case 'pipelines':   main.innerHTML=renderPipelines();break;
+    default:            main.innerHTML=renderDashboard();
+  }
+  document.onclick=function(e){
+    if(!e.target.closest('.connect-btn')&&!e.target.closest('.connect-panel')){const p=document.getElementById('connect-panel');if(p)p.style.display='none';}
+    if(!e.target.closest('.profile-avatar')&&!e.target.closest('#profile-dropdown')){const pd=document.getElementById('profile-dropdown');if(pd)pd.style.display='none';_profileOpen=false;}
+  };
+}
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const txIn=transactions.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+  const txOut=transactions.filter(t=>t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0);
+  const openAlerts=alerts.filter(a=>a.status==='open').length;
+  const pendingKYC=kycRecords.filter(k=>['submitted','extracting','screening','risk_scoring','compliance_review'].includes(k.status)||k.status==='under_review').length;
+  const txFromAC=transactions.filter(t=>t.type==='deal_close').length;
+  return`
+    <div class="page-header"><h1>AutoOps Dashboard</h1>
+      <div class="page-sub">${new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card green"><div class="stat-lbl">Capital In</div><div class="stat-val">$${(txIn/1e3).toFixed(0)}K</div><div class="stat-sub">${transactions.filter(t=>t.amount>0).length} inflows</div></div>
+      <div class="stat-card red"><div class="stat-lbl">Capital Deployed</div><div class="stat-val">$${(txOut/1e3).toFixed(0)}K</div><div class="stat-sub">${transactions.filter(t=>t.amount<0).length} outflows</div></div>
+      <div class="stat-card amber"><div class="stat-lbl">Open Alerts</div><div class="stat-val">${openAlerts}</div><div class="stat-sub">require action</div></div>
+      <div class="stat-card blue"><div class="stat-lbl">KYC Pending</div><div class="stat-val">${pendingKYC}</div><div class="stat-sub">in pipeline</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px">
+      <div class="card">
+        <div class="card-title">Recent Transactions</div>
+        ${transactions.slice(0,6).map(t=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px">
+            <div style="flex:1;overflow:hidden">
+              <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.desc||t.description||''}</div>
+              <div style="color:var(--muted);font-size:10px">${t.date}${t.type==='deal_close'?' &middot; <strong style="color:var(--blue)">from AlphaCore</strong>':''}</div>
+            </div>
+            <div style="font-weight:700;color:${t.amount>=0?'var(--green)':'var(--red)'};white-space:nowrap">${t.amount>=0?'+':''}$${Math.abs(t.amount).toLocaleString()}</div>
+          </div>`).join('')}
+        ${txFromAC?`<div style="font-size:11px;color:var(--blue);margin-top:8px">&#9733; ${txFromAC} deal transaction${txFromAC!==1?'s':''} received from AlphaCore</div>`:''}
+      </div>
+      <div class="card">
+        <div class="card-title">Run Log</div>
+        ${runLog.slice(0,6).map(r=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+            <div style="width:6px;height:6px;border-radius:50%;background:${r.status==='success'?'var(--green)':r.status==='warning'?'var(--amber)':'var(--red)'};flex-shrink:0"></div>
+            <div style="flex:1;min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.summary}</div><div style="color:var(--muted);font-size:10px">${r.module} &middot; ${r.time}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Open Alerts</div>
+      ${alerts.filter(a=>a.status==='open').map(a=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:6px;background:${RISK_COLOR[a.severity]||'#566382'}0d;border:1px solid ${RISK_COLOR[a.severity]||'#566382'}33;margin-bottom:6px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${RISK_COLOR[a.severity]||'#566382'};flex-shrink:0"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">${a.title}</div><div style="font-size:11px;color:var(--muted)">${a.entity} &middot; ${a.detail}</div></div>
+          <button onclick="resolveAlert('${a.type}','${a.entity}')" style="font-size:10px;padding:4px 10px;background:var(--surf2);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted)">Resolve</button>
+        </div>`).join('')}
+    </div>`;
+}
+function resolveAlert(type,entity){
+  const a=alerts.find(x=>x.type===type&&x.entity===entity);
+  if(a){a.status='resolved';render();toast('Alert resolved: '+entity,'#1fc98a');}
+}
+
+// ── Document Processor ───────────────────────────────────────────────────────
+function renderDocuments(){
+  const typeColors={id_document:'#4a7cff',company_doc:'#1fc98a',sof_declaration:'#f59e0b',kyc_doc:'#a78bfa',contract:'#f04166',other:'#566382'};
+  const typeLabels={id_document:'ID Doc',company_doc:'Company Doc',sof_declaration:'Source of Funds',kyc_doc:'KYC Doc',contract:'Contract',other:'Other'};
+  return`
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div><h1>Document Processor</h1><div class="page-sub">${documents_ao.length} documents</div></div>
+      <label style="cursor:pointer;display:inline-flex;align-items:center">
+        <input type="file" multiple accept=".pdf,.docx,.xlsx,.txt,.png,.jpg" style="display:none" onchange="handleAODocUpload(this.files)">
+        <span class="btn-p">&#43; Upload</span>
+      </label>
+    </div>
+    <div class="card">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="border-bottom:2px solid var(--border)">
+          ${['Document','Type','Entity','Uploaded','Size','Status',''].map(h=>`<th style="text-align:left;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700">${h}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${documents_ao.map(doc=>`
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px;font-weight:600;max-width:200px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${doc.name}">${doc.name}</div></td>
+              <td style="padding:10px">${tag(typeLabels[doc.type]||doc.type,typeColors[doc.type]||'#566382')}</td>
+              <td style="padding:10px;color:var(--muted)">${doc.entity||'—'}</td>
+              <td style="padding:10px;color:var(--muted)">${doc.uploaded}</td>
+              <td style="padding:10px;color:var(--muted)">${doc.size}</td>
+              <td style="padding:10px">${tag(doc.status,doc.status==='verified'?'#1fc98a':doc.status==='pending'?'#f59e0b':'#566382')}</td>
+              <td style="padding:10px">
+                <div style="display:flex;gap:6px">
+                  ${doc.b64?`<button onclick="viewAODoc('${doc.id}')" style="font-size:11px;padding:4px 9px;background:var(--blue-d);color:var(--blue);border:1px solid rgba(74,124,255,.3);border-radius:4px;cursor:pointer;font-weight:600">&#128065; View</button>`:''}
+                  <button onclick="runExtraction('${doc.id}')" style="font-size:11px;padding:4px 9px;background:var(--surf2);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted)">&#9881; Extract</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+function handleAODocUpload(files){
+  Array.from(files).forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      documents_ao.unshift({id:'ao_'+Date.now(),name:f.name,type:'other',entity:'',uploaded:new Date().toLocaleDateString('en-GB'),size:(f.size/1024).toFixed(0)+' KB',status:'pending',b64:e.target.result.split(',')[1],mime:f.type});
+      render();toast('Uploaded: '+f.name,'#1fc98a');
+    };
+    reader.readAsDataURL(f);
+  });
+}
+function viewAODoc(id){
+  const doc=documents_ao.find(d=>d.id===id);
+  if(!doc||!doc.b64)return;
+  const url='data:'+(doc.mime||'application/pdf')+';base64,'+doc.b64;
+  window.open(url,'_blank');
+}
+function runExtraction(id){
+  const doc=documents_ao.find(d=>d.id===id);if(!doc)return;
+  toast('Textract extraction queued for: '+doc.name,'#4a7cff');
+  setTimeout(()=>{
+    doc.status='verified';
+    render();toast('Extraction complete: '+doc.name,'#1fc98a');
+    runLog.unshift({module:'documents',task:'extract',status:'success',summary:'Extracted: '+doc.name,duration:2300,records:1,time:'just now'});
+  },2000);
+}
+
+// ── KYC Pipeline ─────────────────────────────────────────────────────────────
+function renderKYC(){
+  const tabs=['Queue','Pipeline','History'];
+  return`
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div><h1>KYC / AML</h1><div class="page-sub">${kycRecords.length} records · ${kycRecords.filter(k=>k.status==='approved').length} approved · ${kycRecords.filter(k=>k.status==='flagged'||k.status==='under_review').length} flagged</div></div>
+      <button class="btn-p" onclick="loadKYCFromDD()">&#8635; Sync from DD Engine</button>
+    </div>
+    <div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border)">
+      ${tabs.map((t,i)=>`<button onclick="state.kycTab='${['queue','pipeline','history'][i]}';render()" style="padding:8px 18px;font-size:13px;background:none;border:none;cursor:pointer;color:${state.kycTab===['queue','pipeline','history'][i]?'var(--blue)':'var(--muted)'};border-bottom:2px solid ${state.kycTab===['queue','pipeline','history'][i]?'var(--blue)':'transparent'};font-weight:${state.kycTab===['queue','pipeline','history'][i]?'600':'400'}">${t}</button>`).join('')}
+    </div>
+    ${state.kycTab==='queue'?renderKYCQueue():state.kycTab==='pipeline'?renderKYCPipeline():renderKYCHistory()}`;
+}
+
+function renderKYCQueue(){
+  const pending=kycRecords.filter(k=>['submitted','extracting','screening','risk_scoring','compliance_review','under_review','pending_screening'].includes(k.status));
+  if(!pending.length) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">&#10003;</div><div style="font-size:14px;font-weight:600">All clear</div><div style="font-size:12px;margin-top:4px">No pending KYC records. Sync from DD Engine to import new submissions.</div></div>`;
+  return pending.map(k=>renderKYCCard(k)).join('');
+}
+
+function renderKYCCard(k){
+  const stageIdx=KYC_STAGES.indexOf(k.status);
+  const isInPipeline=stageIdx>=0;
+  const stageColor=KYC_STAGE_COLOR[k.status]||RISK_COLOR[k.risk]||'#566382';
+  const statusColor=STATUS_COLOR[k.status]||'#566382';
+  return`
+    <div class="card" style="margin-bottom:12px;border-left:4px solid ${stageColor}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:4px">${k.name}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${tag(k.type==='individual'?'Individual':'Corporate','#566382')}
+            ${tag(k.country,'#566382')}
+            ${tag(k.status.replace(/_/g,' '),statusColor)}
+            ${k.risk?tag('Risk: '+k.risk,RISK_COLOR[k.risk]):''}
+          </div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:var(--muted)">Screened ${k.screened||'—'}</div>
+      </div>
+      ${isInPipeline?`
+        <div style="margin-bottom:14px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Pipeline stage</div>
+          <div style="display:flex;gap:3px">
+            ${KYC_STAGES.map((s,i)=>`<div style="flex:1;height:5px;border-radius:3px;background:${i<=stageIdx?KYC_STAGE_COLOR[s]:'var(--border)'}"></div>`).join('')}
+          </div>
+          <div style="font-size:11px;color:${stageColor};margin-top:5px;font-weight:600">${KYC_STAGE_LBL[k.status]||k.status}</div>
+        </div>`:''}
+      ${k.flags&&k.flags.length?`<div style="margin-bottom:10px">${k.flags.map(f=>`<span style="display:inline-flex;align-items:center;gap:4px;margin-right:6px;margin-bottom:4px;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;background:rgba(240,65,102,.1);color:var(--red);border:1px solid rgba(240,65,102,.25)">&#9888; ${f}</span>`).join('')}</div>`:''}
+      ${k.notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px">${k.notes}</div>`:''}
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        ${k.status!=='approved'&&k.status!=='rejected'?`<button onclick="advanceKYC('${k.id}')" class="btn-p" style="font-size:11px;padding:6px 12px">&#8594; Advance</button>`:''}
+        ${k.status==='compliance_review'||k.status==='under_review'?`
+          <button onclick="decideKYC('${k.id}','approved')" style="font-size:11px;padding:6px 12px;background:rgba(31,201,138,.1);color:var(--green);border:1px solid rgba(31,201,138,.3);border-radius:6px;cursor:pointer;font-weight:600">&#10003; Approve</button>
+          <button onclick="decideKYC('${k.id}','rejected')" style="font-size:11px;padding:6px 12px;background:rgba(240,65,102,.1);color:var(--red);border:1px solid rgba(240,65,102,.3);border-radius:6px;cursor:pointer;font-weight:600">&#10005; Reject</button>
+          <button onclick="decideKYC('${k.id}','flagged')" style="font-size:11px;padding:6px 12px;background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3);border-radius:6px;cursor:pointer;font-weight:600">&#9888; Flag</button>`:''}
+        <button onclick="addKYCNote('${k.id}')" style="font-size:11px;padding:6px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted)">&#128221; Note</button>
+      </div>
+    </div>`;
+}
+
+function renderKYCPipeline(){
+  // Kanban-style pipeline view
+  return`<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;overflow-x:auto">
+    ${KYC_STAGES.map(stage=>{
+      const col=kycRecords.filter(k=>k.status===stage);
+      return`<div style="min-width:150px">
+        <div style="padding:8px;background:var(--surf);border:1px solid var(--border);border-radius:6px;border-top:3px solid ${KYC_STAGE_COLOR[stage]};margin-bottom:8px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">${KYC_STAGE_LBL[stage]}</div>
+          <div style="font-size:20px;font-weight:700;color:${KYC_STAGE_COLOR[stage]}">${col.length}</div>
+        </div>
+        ${col.map(k=>`<div style="background:var(--surf);border:1px solid var(--border);border-radius:6px;padding:9px 10px;margin-bottom:6px;cursor:pointer" onclick="state.kycTab='queue';state.selectedKYC='${k.id}';render()">
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">${k.name}</div>
+          <div style="font-size:10px;color:var(--muted)">${k.country} &middot; ${k.type}</div>
+          ${k.risk?`<div style="font-size:10px;font-weight:700;color:${RISK_COLOR[k.risk]};margin-top:3px">${k.risk} risk</div>`:''}
+        </div>`).join('')}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderKYCHistory(){
+  const done=kycRecords.filter(k=>k.status==='approved'||k.status==='rejected');
+  if(!done.length) return`<div style="color:var(--muted);font-size:13px;padding:20px">No completed KYC records yet.</div>`;
+  return`<div class="card">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="border-bottom:2px solid var(--border)">${['Name','Type','Country','Risk','Decision','Screened'].map(h=>`<th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">${h}</th>`).join('')}</tr></thead>
+      <tbody>${done.map(k=>`<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:9px 8px;font-weight:600">${k.name}</td>
+        <td style="padding:9px 8px">${tag(k.type,'#566382')}</td>
+        <td style="padding:9px 8px;color:var(--muted)">${k.country}</td>
+        <td style="padding:9px 8px">${k.risk?tag(k.risk,RISK_COLOR[k.risk]):tag('—','#566382')}</td>
+        <td style="padding:9px 8px">${tag(k.status,STATUS_COLOR[k.status]||'#566382')}</td>
+        <td style="padding:9px 8px;color:var(--muted)">${k.screened||'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+function advanceKYC(id){
+  const k=kycRecords.find(x=>x.id===id);if(!k)return;
+  const idx=KYC_STAGES.indexOf(k.status);
+  if(idx>=0&&idx<KYC_STAGES.length-1){
+    k.status=KYC_STAGES[idx+1];
+    runLog.unshift({module:'kyc',task:'advance',status:'success',summary:`${k.name} → ${KYC_STAGE_LBL[k.status]}`,duration:800,records:1,time:'just now'});
+    render();toast(`${k.name} advanced to: ${KYC_STAGE_LBL[k.status]}`,'#4a7cff');
+  }
+}
+
+function decideKYC(id,decision){
+  const k=kycRecords.find(x=>x.id===id);if(!k)return;
+  k.status=decision;k.screened=new Date().toISOString().slice(0,10);
+  const col=decision==='approved'?'#1fc98a':decision==='rejected'?'#f04166':'#f59e0b';
+  runLog.unshift({module:'kyc',task:'decision',status:decision==='rejected'?'error':'success',summary:`${k.name}: ${decision}`,duration:500,records:1,time:'just now'});
+  if(decision==='approved')alerts=alerts.filter(a=>a.entity!==k.name);
+  render();toast(`${k.name}: ${decision.toUpperCase()}`,col);
+}
+
+function addKYCNote(id){
+  const k=kycRecords.find(x=>x.id===id);if(!k)return;
+  const note=prompt('Add note for '+k.name+':');
+  if(note){k.notes=(k.notes?k.notes+'\n':'')+note;render();toast('Note added','#4a7cff');}
+}
+
+async function loadKYCFromDD(){
+  // Pull KYC records from DD Engine localStorage
+  try{
+    const rev=JSON.parse(localStorage.getItem('dd_reviews_v2')||'[]');
+    const kyc=rev.filter(r=>r.type==='kyc'||r.source==='kyc');
+    let added=0;
+    kyc.forEach(r=>{
+      const existing=kycRecords.find(k=>k.id===r.key||k.name===(r.companyName||r.formData?.name));
+      if(!existing){
+        const fd=r.formData||{};
+        kycRecords.unshift({
+          id:r.key||('kyc_'+Date.now()),name:r.companyName||fd.name||'Unknown',
+          type:r.kycType||'individual',country:fd.country||'—',
+          status:'submitted',risk:r.analysis?.overall_risk_level||'medium',
+          pep:fd.pep!=='no',sanctions:false,screened:null,docs_complete:false,
+          source:'dd_engine',notes:fd.notes||'',
+          flags:(r.analysis?.risk_flags||[]).map(f=>f.title),
+          dd_key:r.key,dd_analysis:r.analysis,formData:fd
+        });
+        added++;
+      }
+    });
+    if(added){render();toast(`Imported ${added} KYC record${added!==1?'s':''} from DD Engine`,'#1fc98a');}
+    else toast('No new KYC records from DD Engine','#f59e0b');
+  }catch(e){toast('Error loading from DD Engine: '+e.message,'#f04166');}
+}
+
+// ── Compliance ───────────────────────────────────────────────────────────────
+function renderCompliance(){
+  const open=alerts.filter(a=>a.status==='open');
+  const sevColor={high:'#f04166',medium:'#f59e0b',low:'#4a7cff',critical:'#dc143c'};
+  return`
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div><h1>Compliance</h1><div class="page-sub">${open.length} open alerts · ${alerts.filter(a=>a.status==='resolved').length} resolved</div></div>
+      <button class="btn-p" onclick="runWatchlistScreen()">&#9881; Run watchlist screen</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+      ${['high','medium','low'].map(s=>`<div class="stat-card" style="border-top:3px solid ${sevColor[s]}"><div class="stat-lbl">${s.charAt(0).toUpperCase()+s.slice(1)} severity</div><div class="stat-val" style="color:${sevColor[s]}">${alerts.filter(a=>a.severity===s&&a.status==='open').length}</div></div>`).join('')}
+    </div>
+    ${open.length?open.map(a=>`
+      <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:8px;border-left:4px solid ${sevColor[a.severity]||'#566382'}">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="font-size:14px;font-weight:700">${a.title}</div>
+            ${tag(a.severity,sevColor[a.severity])}
+          </div>
+          <div style="font-size:12px;color:var(--muted)">${a.entity} &middot; ${a.detail}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Created: ${a.created}</div>
+        </div>
+        <button onclick="resolveAlert('${a.type}','${a.entity}')" style="font-size:11px;padding:6px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);white-space:nowrap">Mark resolved</button>
+      </div>`).join(''):`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">&#10003;</div><div style="font-size:14px;font-weight:600">No open alerts</div></div>`}`;
+}
+
+function runWatchlistScreen(){
+  toast('Watchlist screening running...','#4a7cff');
+  setTimeout(()=>{
+    runLog.unshift({module:'compliance',task:'run_watchlist_screen',status:'success',summary:'Screened '+kycRecords.length+' entities, '+alerts.filter(a=>a.status==='open').length+' open alerts',duration:8340,records:kycRecords.length,time:'just now'});
+    render();toast('Watchlist screen complete','#1fc98a');
+  },1800);
+}
+
+// ── Transactions ─────────────────────────────────────────────────────────────
+function renderTransactions(){
+  const filters=['all','capital_call','management_fee','distribution','investment','deal_close'];
+  const filterLbl={all:'All',capital_call:'Capital Calls',management_fee:'Mgmt Fees',distribution:'Distributions',investment:'Investments',deal_close:'Deal Closes'};
+  const filtered=state.txFilter==='all'?transactions:transactions.filter(t=>t.type===state.txFilter);
+  const balance=transactions.reduce((s,t)=>s+t.amount,0);
+  const inflows=transactions.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+  const outflows=transactions.filter(t=>t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0);
+  return`
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div><h1>Transactions</h1><div class="page-sub">${transactions.length} transactions · Balance: <strong style="color:${balance>=0?'var(--green)':'var(--red)'}">${balance>=0?'+':''}$${balance.toLocaleString()}</strong></div></div>
+      <button class="btn-g" onclick="loadTransactionsFromStorage();render()">&#8635; Refresh</button>
+    </div>
+    <div class="stat-grid" style="margin-bottom:16px">
+      <div class="stat-card green"><div class="stat-lbl">Total In</div><div class="stat-val">+$${(inflows/1e3).toFixed(0)}K</div></div>
+      <div class="stat-card red"><div class="stat-lbl">Total Out</div><div class="stat-val">-$${(outflows/1e3).toFixed(0)}K</div></div>
+      <div class="stat-card blue"><div class="stat-lbl">Net Balance</div><div class="stat-val" style="color:${balance>=0?'var(--green)':'var(--red)'}">$${(balance/1e3).toFixed(0)}K</div></div>
+      <div class="stat-card amber"><div class="stat-lbl">From AlphaCore</div><div class="stat-val">${transactions.filter(t=>t.type==='deal_close').length}</div></div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${filters.map(f=>`<button onclick="state.txFilter='${f}';render()" style="padding:5px 12px;border-radius:20px;border:1px solid ${state.txFilter===f?'var(--blue)':'var(--border)'};background:${state.txFilter===f?'var(--blue-d)':'var(--surf)'};color:${state.txFilter===f?'var(--blue)':'var(--muted)'};font-size:11px;cursor:pointer;font-weight:${state.txFilter===f?'600':'400'}">${filterLbl[f]}</button>`).join('')}
+    </div>
+    <div class="card">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="border-bottom:2px solid var(--border)">${['Date','Description','Type','Amount','Status',''].map(h=>`<th style="text-align:left;padding:8px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">${h}</th>`).join('')}</tr></thead>
+        <tbody>${filtered.map(t=>`
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 8px;color:var(--muted);font-family:monospace;font-size:11px">${t.date}</td>
+            <td style="padding:9px 8px;max-width:280px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.desc||''}">${t.desc||t.description||'—'}</div>${t.type==='deal_close'?'<div style="font-size:10px;color:var(--blue);margin-top:2px">&#9733; From AlphaCore</div>':''}</td>
+            <td style="padding:9px 8px">${tag(t.type.replace(/_/g,' '),'#566382')}</td>
+            <td style="padding:9px 8px;font-weight:700;color:${t.amount>=0?'var(--green)':'var(--red)'};">${t.amount>=0?'+':''}$${Math.abs(t.amount).toLocaleString()}</td>
+            <td style="padding:9px 8px">${tag(t.status||'posted',t.status==='reconciled'?'#1fc98a':t.status==='posted'?'#4a7cff':'#566382')}</td>
+            <td style="padding:9px 8px"><button onclick="reconcileTx(${transactions.indexOf(t)})" style="font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surf2);cursor:pointer;color:var(--muted)">&#10003;</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+function reconcileTx(idx){
+  if(transactions[idx]){transactions[idx].status='reconciled';render();toast('Transaction reconciled','#1fc98a');}
+}
+
+// ── Pipelines ────────────────────────────────────────────────────────────────
+function renderPipelines(){
+  const mods=[
+    {id:'kyc',name:'KYC Screening',desc:'Screen new KYC records from DD Engine against OFAC, UN, EU watchlists',schedule:'On demand',last:'2 min ago',color:'#4a7cff'},
+    {id:'compliance',name:'Watchlist Monitor',desc:'Daily compliance screening of all active entities and transactions',schedule:'Daily 06:00 UTC',last:'15 min ago',color:'#1fc98a'},
+    {id:'transaction',name:'Transaction Reconciler',desc:'Match and reconcile all posted transactions against AlphaCore deal records',schedule:'Daily 18:00 UTC',last:'2h ago',color:'#f59e0b'},
+    {id:'portfolio',name:'Portfolio Refresh',desc:'Pull latest valuations and positions from AlphaCore for dashboard metrics',schedule:'Daily 18:30 UTC',last:'1h ago',color:'#a78bfa'},
+    {id:'document',name:'Document Processor',desc:'Process uploaded documents through AWS Textract and classify by type',schedule:'On upload',last:'4h ago',color:'#f04166'},
+  ];
+  return`
+    <div class="page-header"><h1>Automation Pipelines</h1><div class="page-sub">${mods.length} pipelines · ${runLog.filter(r=>r.status==='error').length} errors in last run</div></div>
+    <div style="display:grid;gap:12px">
+      ${mods.map(m=>{
+        const recent=runLog.filter(r=>r.module===m.id).slice(0,3);
+        const lastStatus=recent[0]?.status||'unknown';
+        const sc=lastStatus==='success'?'var(--green)':lastStatus==='warning'?'var(--amber)':lastStatus==='error'?'var(--red)':'var(--muted)';
+        return`<div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:10px;height:10px;border-radius:50%;background:${sc};flex-shrink:0"></div>
+              <div>
+                <div style="font-size:14px;font-weight:700">${m.name}</div>
+                <div style="font-size:12px;color:var(--muted)">${m.desc}</div>
+              </div>
+            </div>
+            <button onclick="runPipeline('${m.id}')" style="font-size:11px;padding:6px 12px;background:var(--blue-d);color:var(--blue);border:1px solid rgba(74,124,255,.3);border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;flex-shrink:0">&#9654; Run now</button>
+          </div>
+          <div style="display:flex;gap:20px;font-size:11px;color:var(--muted);margin-bottom:8px">
+            <span>Schedule: <strong>${m.schedule}</strong></span>
+            <span>Last run: <strong>${m.last}</strong></span>
+            <span>Status: <strong style="color:${sc}">${lastStatus}</strong></span>
+          </div>
+          ${recent.length?`<div style="border-top:1px solid var(--border);padding-top:8px;font-size:11px;color:var(--muted)">${recent.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><div style="width:5px;height:5px;border-radius:50%;background:${r.status==='success'?'var(--green)':r.status==='warning'?'var(--amber)':'var(--red)'}"></div>${r.summary} &middot; ${r.time}</div>`).join('')}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+function runPipeline(mod){
+  toast('Running pipeline: '+mod+'...','#4a7cff');
+  setTimeout(()=>{
+    runLog.unshift({module:mod,task:'run_pipeline',status:'success',summary:'Pipeline "'+mod+'" ran successfully',duration:Math.floor(Math.random()*8000)+1000,records:Math.floor(Math.random()*50)+5,time:'just now'});
+    render();toast('Pipeline complete: '+mod,'#1fc98a');
+  },1500);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(function init(){
+  try{
+    applyTheme(CUR_THEME);
+    applyLang(CUR_LANG);
+    updateConnectUI();
+    initSidebar();
+    loadTransactionsFromStorage();
+    // Try to import KYC from DD Engine localStorage on load
+    try{
+      const rev=JSON.parse(localStorage.getItem('dd_reviews_v2')||'[]');
+      const kyc=rev.filter(r=>r.type==='kyc'||r.source==='kyc');
+      kyc.forEach(r=>{
+        if(!kycRecords.find(k=>k.id===r.key)){
+          const fd=r.formData||{};
+          kycRecords.unshift({id:r.key,name:r.companyName||fd.name||'Unknown',type:r.kycType||'individual',country:fd.country||'—',status:'submitted',risk:r.analysis?.overall_risk_level||'medium',pep:fd.pep!=='no',sanctions:false,screened:null,docs_complete:false,source:'dd_engine',notes:fd.notes||'',flags:(r.analysis?.risk_flags||[]).map(f=>f.title),dd_key:r.key});
+        }
+      });
+    }catch(e){}
+    render();
+  }catch(e){
+    console.error('AutoOps init error:',e);
+    const mc=document.getElementById('main-content');
+    if(mc)mc.innerHTML='<div style="color:#f04166;padding:20px;font-family:monospace;font-size:12px">Init error: '+e.message+'<br>'+(e.stack||'')+'</div>';
+  }
+})();
+
+</script>
+</body>
+</html>

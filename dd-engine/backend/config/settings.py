@@ -116,3 +116,12 @@ TIME_ZONE     = 'UTC'
 USE_I18N      = True
 USE_TZ        = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ── URL prefix (namespaced deployment) ───────────────────────────────────────
+FORCE_SCRIPT_NAME = config('SCRIPT_NAME', default='/dd')
+
+# ── Integration peers (blank = standalone) ──────────────────────────────────
+INTEGRATION_API_KEY = config('INTEGRATION_API_KEY', default='')
+AUTOOPS_URL         = config('AUTOOPS_URL', default='')
+AUTOOPS_API_KEY     = config('AUTOOPS_API_KEY', default='')
+DD_ENGINE_URL       = config('DD_ENGINE_URL', default='')

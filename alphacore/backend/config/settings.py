@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'apps.committee',
     'apps.portfolio',
     'apps.documents',
+    'apps.reporting',
+    'apps.knowledge',
 ]
 
 MIDDLEWARE = [
@@ -176,3 +178,27 @@ SOCIALACCOUNT_PROVIDERS = {
 AWS_REGION     = config('AWS_REGION',     default='eu-west-2')
 TABLE_PREFIX   = config('TABLE_PREFIX',   default='alphacore_')
 # DYNAMODB_ENDPOINT = config('DYNAMODB_ENDPOINT', default='')  # uncomment for local testing
+
+# ── URL prefix (namespaced deployment) ───────────────────────────────────────
+FORCE_SCRIPT_NAME = config('SCRIPT_NAME', default='/alphacore')
+
+# ── Integration peers (blank = standalone) ──────────────────────────────────
+INTEGRATION_API_KEY = config('INTEGRATION_API_KEY', default='')
+DD_ENGINE_URL        = config('DD_ENGINE_URL',  default='')
+DD_ENGINE_API_KEY    = config('DD_ENGINE_API_KEY', default='')
+AUTOOPS_URL          = config('AUTOOPS_URL', default='')
+AUTOOPS_API_KEY      = config('AUTOOPS_API_KEY', default='')
+
+# ── Resend (replaces SES for all transactional email) ────────────────────────
+RESEND_API_KEY = config('RESEND_API_KEY', default='')
+# All emails sent from: aurel.botouli@primealphasecurities.com
+# PAS admin notifications: ir@primealphasecurities.com
+
+# Base URL used for token email links (set to your EC2 public URL in production)
+ALPHACORE_BASE_URL = config('ALPHACORE_BASE_URL', default='')
+
+# ── Reporting S3 bucket (set via environment variable) ───────────────────────
+# Reports are uploaded as: reports/{company_id}/pas_report_{period}_{year}_{title}.pdf
+# IAM role on EC2 must have s3:PutObject on this bucket.
+import os as _os
+REPORTS_S3_BUCKET = _os.environ.get('REPORTS_S3_BUCKET', '')   # e.g. 'pas-reports-prod'

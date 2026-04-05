@@ -51,16 +51,34 @@ class CompanyPublicSerializer(serializers.ModelSerializer):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    user    = UserPublicSerializer(read_only=True)
-    role    = RoleSerializer(read_only=True)
-    role_id = serializers.PrimaryKeyRelatedField(
+    user       = UserPublicSerializer(read_only=True)
+    role       = RoleSerializer(read_only=True)
+    role_id    = serializers.PrimaryKeyRelatedField(
         queryset=Role.objects.all(), write_only=True, source='role'
     )
+    role_name  = serializers.SerializerMethodField()
+    role_label = serializers.SerializerMethodField()
+    user_name  = serializers.SerializerMethodField()
+    user_email = serializers.SerializerMethodField()
+
     class Meta:
         model  = Membership
-        fields = ['id', 'user', 'role', 'role_id', 'status', 'can_approve_members',
-                  'joined_at', 'invited_by']
+        fields = ['id', 'user', 'role', 'role_id', 'role_name', 'role_label',
+                  'user_name', 'user_email',
+                  'status', 'can_approve_members', 'joined_at', 'invited_by']
         read_only_fields = ['user', 'joined_at', 'invited_by']
+
+    def get_role_name(self, obj):
+        return obj.role.name if obj.role else None
+
+    def get_role_label(self, obj):
+        return obj.role.label if obj.role else None
+
+    def get_user_name(self, obj):
+        return obj.user.get_full_name() or obj.user.username if obj.user else None
+
+    def get_user_email(self, obj):
+        return obj.user.email if obj.user else None
 
 
 class JoinRequestSerializer(serializers.ModelSerializer):
@@ -88,10 +106,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if not m:
             return None
         return {
+            'id':                 m.id,
             'role':               m.role.name if m.role else None,
+            'role_name':          m.role.name if m.role else None,
             'role_label':         m.role.label if m.role else None,
             'can_approve_members':m.can_approve_members,
             'permissions':        m.permissions,
+            'is_owner':           m.role.name == 'owner' if m.role else False,
+            'is_admin':           m.role.name in ('owner','admin') if m.role else False,
+            'can_vote_ic':        m.permissions.get('can_vote_ic', False),
         }
 
     def update(self, instance, validated_data):

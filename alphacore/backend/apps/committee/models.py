@@ -108,3 +108,78 @@ class ICComment(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+# ── IC Memo Version — immutable snapshot on every significant save ────────────
+class ICMemoVersion(models.Model):
+    """
+    Immutable audit record. Created every time a memo moves stage
+    or is materially edited. Never deleted.
+    """
+    memo         = models.ForeignKey(ICMemo, on_delete=models.CASCADE, related_name='versions')
+    version_num  = models.PositiveIntegerField()           # 1, 2, 3 …
+    changed_by   = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    change_note  = models.CharField(max_length=255, blank=True)  # e.g. "Submitted for voting"
+    snapshot     = models.JSONField()                      # Full memo state as JSON
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering            = ['-version_num']
+        unique_together     = ['memo', 'version_num']
+
+    def __str__(self):
+        return f"Memo {self.memo_id} v{self.version_num}"
+
+
+# ── IC Memo Attachment ────────────────────────────────────────────────────────
+class ICMemoAttachment(models.Model):
+    """
+    Documents attached to a memo (DD reports, financials, term sheets).
+    Stores S3 key — actual file lives in S3.
+    """
+    CATEGORY_CHOICES = [
+        ('dd_report',    'DD Report'),
+        ('financial',    'Financial Model'),
+        ('legal',        'Legal Document'),
+        ('term_sheet',   'Term Sheet'),
+        ('other',        'Other'),
+    ]
+    memo         = models.ForeignKey(ICMemo, on_delete=models.CASCADE, related_name='attachments')
+    filename     = models.CharField(max_length=255)
+    s3_key       = models.CharField(max_length=500)
+    category     = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    size_bytes   = models.PositiveIntegerField(default=0)
+    uploaded_by  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    uploaded_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['uploaded_at']
+
+    def __str__(self):
+        return self.filename
+
+
+# ── IC Notification log ───────────────────────────────────────────────────────
+class ICNotification(models.Model):
+    """
+    Tracks every email notification sent for IC actions.
+    Prevents double-sending and provides a delivery audit trail.
+    """
+    EVENT_CHOICES = [
+        ('submitted',    'Memo Submitted'),
+        ('vote_reminder','Vote Reminder'),
+        ('approved',     'Memo Approved'),
+        ('rejected',     'Memo Rejected'),
+        ('deferred',     'Memo Deferred'),
+        ('more_info',    'More Info Requested'),
+        ('revised',      'Memo Revised'),
+    ]
+    memo        = models.ForeignKey(ICMemo, on_delete=models.CASCADE, related_name='notifications')
+    recipient   = models.ForeignKey(User, on_delete=models.CASCADE)
+    event       = models.CharField(max_length=20, choices=EVENT_CHOICES)
+    sent_at     = models.DateTimeField(auto_now_add=True)
+    resend_id   = models.CharField(max_length=100, blank=True)   # Resend message ID
+    success     = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-sent_at']

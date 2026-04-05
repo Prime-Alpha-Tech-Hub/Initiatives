@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: '/alphacore',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -66,14 +66,18 @@ export const ddApi = {
 };
 
 export const committeeApi = {
-  list:       (params) => api.get('/committee/memos/', { params }),
-  get:        (id)     => api.get(`/committee/memos/${id}/`),
-  create:     (data)   => api.post('/committee/memos/', data),
-  update:     (id, d)  => api.patch(`/committee/memos/${id}/`, d),
-  submit:     (id, d)  => api.post(`/committee/memos/${id}/submit/`, d),
-  vote:       (id, d)  => api.post(`/committee/memos/${id}/cast_vote/`, d),
-  decide:     (id, d)  => api.post(`/committee/memos/${id}/decide/`, d),
-  addComment: (id, d)  => api.post(`/committee/memos/${id}/add_comment/`, d),
+  list:            (params) => api.get('/committee/memos/', { params }),
+  get:             (id)     => api.get(`/committee/memos/${id}/`),
+  create:          (data)   => api.post('/committee/memos/', data),
+  update:          (id, d)  => api.patch(`/committee/memos/${id}/`, d),
+  submit:          (id, d)  => api.post(`/committee/memos/${id}/submit/`, d),
+  vote:            (id, d)  => api.post(`/committee/memos/${id}/cast_vote/`, d),
+  decide:          (id, d)  => api.post(`/committee/memos/${id}/decide/`, d),
+  requestRevision: (id, d)  => api.post(`/committee/memos/${id}/request_revision/`, d),
+  addComment:      (id, d)  => api.post(`/committee/memos/${id}/add_comment/`, d),
+  history:         (id)     => api.get(`/committee/memos/${id}/history/`),
+  sendReminders:   (id)     => api.post(`/committee/memos/${id}/send_reminders/`),
+  exportMemo:      (id)     => api.get(`/committee/memos/${id}/export/`),
 };
 
 export const portfolioApi = {
@@ -119,6 +123,7 @@ export const accountsApi = {
   deleteRole:     (id)       => api.delete(`/accounts/roles/${id}/`),
 
   // Members
+  members:        ()         => api.get('/accounts/members/'),
   getMembers:     ()         => api.get('/accounts/members/'),
   changeRole:     (id, role_id) => api.post(`/accounts/members/${id}/change_role/`, { role_id }),
   delegateApproval: (id, can) => api.post(`/accounts/members/${id}/delegate_approval/`, { can_approve: can }),
@@ -130,4 +135,55 @@ export const accountsApi = {
   approveRequest: (id, role) => api.post(`/accounts/join-requests/${id}/approve/`, { role }),
   rejectRequest:  (id, note) => api.post(`/accounts/join-requests/${id}/reject/`, { note }),
   myJoinStatus:   ()         => api.get('/accounts/join-requests/my_status/'),
+
+  // Integration API keys
+  listApiKeys:    ()         => api.get('/accounts/api-keys/'),
+  createApiKey:   (data)     => api.post('/accounts/api-keys/create/', data),
+  revokeApiKey:   (id)       => api.delete(`/accounts/api-keys/${id}/revoke/`),
+
+  // Integration connections
+  listIntegrations:  ()      => api.get('/accounts/integrations/'),
+  saveIntegration:   (data)  => api.post('/accounts/integrations/save/', data),
+  pingIntegration:   (id)    => api.post(`/accounts/integrations/${id}/ping/`),
+
+  // Relinquish admin
+  relinquishAdmin: (company_id) => api.post('/accounts/relinquish-admin/', { company_id }),
+};
+
+export const reportingApi = {
+  // Recipients
+  listRecipients:   ()      => api.get('/reporting/recipients/'),
+  createRecipient:  (data)  => api.post('/reporting/recipients/', data),
+  deleteRecipient:  (id)    => api.post(`/reporting/recipients/${id}/deactivate/`),
+  // Reports
+  listReports:      ()      => api.get('/reporting/reports/'),
+  getReport:        (id)    => api.get(`/reporting/reports/${id}/`),
+  generateReport:   (data)  => api.post('/reporting/reports/generate/', data),
+  sendReport:       (id, d) => api.post(`/reporting/reports/${id}/send/`, d),
+  retryFailed:      (id)    => api.post(`/reporting/reports/${id}/retry_failed/`),
+  previewUrl:       (id)    => `/alphacore/api/reporting/reports/${id}/preview/`,
+  exportPdf:        (id)    => api.post(`/reporting/reports/${id}/export_pdf/`),
+  downloadPdfUrl:   (id)    => `/alphacore/api/reporting/reports/${id}/download_pdf/`,
+};
+
+export const knowledgeApi = {
+  // Collections
+  listCollections:  ()       => api.get('/knowledge/collections/'),
+  createCollection: (data)   => api.post('/knowledge/collections/', data),
+  updateCollection: (id, d)  => api.patch(`/knowledge/collections/${id}/`, d),
+  deleteCollection: (id)     => api.delete(`/knowledge/collections/${id}/`),
+
+  // Articles
+  listArticles:    (params)  => api.get('/knowledge/articles/', { params }),
+  getArticle:      (id)      => api.get(`/knowledge/articles/${id}/`),
+  createArticle:   (data)    => api.post('/knowledge/articles/', data),
+  updateArticle:   (id, d)   => api.patch(`/knowledge/articles/${id}/`, d),
+  deleteArticle:   (id)      => api.delete(`/knowledge/articles/${id}/`),
+  searchArticles:  (q, p)    => api.get('/knowledge/articles/search/', { params: { q, ...p } }),
+  pinned:          ()        => api.get('/knowledge/articles/pinned/'),
+  recent:          (n)       => api.get('/knowledge/articles/recent/', { params: { limit: n || 10 } }),
+  togglePin:       (id)      => api.post(`/knowledge/articles/${id}/toggle_pin/`),
+  recordView:      (id)      => api.post(`/knowledge/articles/${id}/view/`),
+  addComment:      (id, d)   => api.post(`/knowledge/articles/${id}/add_comment/`, d),
+  restoreVersion:  (id, vn)  => api.post(`/knowledge/articles/${id}/restore_version/`, { version_num: vn }),
 };

@@ -75,3 +75,18 @@ class DDDocument(models.Model):
                 return f"{size:.1f} {unit}"
             size /= 1024
         return f"{size:.1f} TB"
+
+class DDDocumentArchive(models.Model):
+    """Analyst-managed ordered list of reviewed documents."""
+    document    = models.OneToOneField(DDDocument, on_delete=models.CASCADE, related_name='archive_entry')
+    sort_order  = models.PositiveIntegerField(default=0)
+    group_label = models.CharField(max_length=100, blank=True)  # deal/company group
+    analyst_note= models.TextField(blank=True)
+    archived_at = models.DateTimeField(auto_now_add=True)
+    archived_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        ordering = ['sort_order', '-archived_at']
+
+    def __str__(self):
+        return f"Archive: {self.document.title} (order {self.sort_order})"
